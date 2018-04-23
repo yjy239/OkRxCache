@@ -1,6 +1,6 @@
 package com.yjy.okrxcache.rx.core;
 
-import rx.functions.Function;
+import com.yjy.okrxcache.rx.core.Cache.CacheStrategy;
 
 /**
  * <pre>

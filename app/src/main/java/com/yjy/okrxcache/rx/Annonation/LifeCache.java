@@ -23,4 +23,6 @@ public @interface LifeCache {
     long duaration();
 
     TimeUnit unit();
+
+    boolean setFromNet();
 }

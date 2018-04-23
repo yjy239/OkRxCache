@@ -2,11 +2,14 @@ package com.yjy.okrxcache.rx.core;
 
 
 import com.yjy.okrxcache.rx.Annonation.LifeCache;
+import com.yjy.okrxcache.rx.core.RxInterceptor.Interceptor;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * <pre>
@@ -20,30 +23,18 @@ import rx.Observable;
 
 public class CacheCore {
 
-    private Class<?> mApiClass;
+    private ArrayList<Interceptor> mInterceptors = new ArrayList<>();
 
-    public CacheCore(Class<?> mApiClass){
-        this.mApiClass = mApiClass;
+    public CacheCore(ArrayList<Interceptor> mInterceptors){
+        this.mInterceptors = mInterceptors;
     }
 
-    //解码class
-    private void decodeClass(){
-        if(mApiClass != null){
-//            for(Annotation annonation : mApiClass.getAnnotations()){
-//                if(annonation instanceof LifeCache){
-//                    LifeCache life = (LifeCache)annonation;
-//                    long duaration = life.duaration();
-//                    TimeUnit unit = life.unit();
-//                }
-//            }
-//            ServiceMethod method = new ServiceMethod();
-//            method.setLifeTime();
-        }
-
+    public <T> Observable<CacheResult<T>> loadResource(Observable<T> observable){
+        return observable.map(new Func1<T, CacheResult<T>>() {
+            @Override
+            public CacheResult<T> call(T t) {
+                return null;
+            }
+        });
     }
-
-
-//    public <T> Observable<CacheResult<T>> loadResource(Observable observable){
-//
-//    }
 }

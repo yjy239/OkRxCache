@@ -12,5 +12,9 @@ package com.yjy.okrxcache.rx.core.RxInterceptor;
 
 public interface Interceptor {
 
-    void onInterceptor();
+    void intercept(Chain chain) throws Exception;
+
+    interface Chain{
+        void onInterceptor();
+    }
 }

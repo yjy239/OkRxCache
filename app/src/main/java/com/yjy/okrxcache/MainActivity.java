@@ -71,28 +71,48 @@ public class MainActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build().create(ApiService.class);
 
-        ApiService proxy = (ApiService)cache.getProxyClass(restApi);
+        ApiService proxy = cache.create(restApi);
+
+        proxy.getUsers(1,1)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Subscriber<List<User>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("error",e.toString());
+                    }
+
+                    @Override
+                    public void onNext(List<User> users) {
+                        Log.e("num",""+users.toString());
+                    }
+                });
 
 
-       cache.excute(proxy.getUsers(1,1))
-               .subscribeOn(Schedulers.io())
-               .observeOn(Schedulers.io())
-               .subscribe(new Subscriber<ArrayList>() {
-           @Override
-           public void onCompleted() {
-
-           }
-
-           @Override
-           public void onError(Throwable e) {
-               Log.e("error",e.toString());
-           }
-
-           @Override
-           public void onNext(ArrayList o) {
-               Log.e("num",""+o.toString());
-           }
-       });
+//       cache.excute(proxy.getUsers(1,1))
+//               .subscribeOn(Schedulers.io())
+//               .observeOn(Schedulers.io())
+//               .subscribe(new Subscriber<ArrayList>() {
+//           @Override
+//           public void onCompleted() {
+//
+//           }
+//
+//           @Override
+//           public void onError(Throwable e) {
+//               Log.e("error",e.toString());
+//           }
+//
+//           @Override
+//           public void onNext(ArrayList o) {
+//               Log.e("num",""+o.toString());
+//           }
+//       });
 
 
     }
