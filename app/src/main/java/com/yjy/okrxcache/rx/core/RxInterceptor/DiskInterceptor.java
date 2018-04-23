@@ -1,5 +1,7 @@
 package com.yjy.okrxcache.rx.core.RxInterceptor;
 
+import java.util.Observable;
+
 /**
  * Created by yjy on 2018/4/23.
  */
@@ -7,7 +9,7 @@ package com.yjy.okrxcache.rx.core.RxInterceptor;
 public class DiskInterceptor implements Interceptor {
 
     @Override
-    public void intercept(Chain chain) throws Exception {
-
+    public Observable intercept(Chain chain) throws Exception {
+        return null;
     }
 }

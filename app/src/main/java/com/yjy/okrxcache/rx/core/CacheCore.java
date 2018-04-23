@@ -37,4 +37,8 @@ public class CacheCore {
             }
         });
     }
+
+    public void start(){
+
+    }
 }
