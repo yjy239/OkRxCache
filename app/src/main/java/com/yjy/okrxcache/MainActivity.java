@@ -4,11 +4,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.yjy.okrxcache.rx.core.OkRxCache;
-import com.yjy.okrxcache.rx.core.ProcessHandler;
+import com.yjy.okrxcache.test.ApiService;
+import com.yjy.okrxcache_core.rx.core.OkRxCache;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Retrofit;
@@ -28,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
 
         OkRxCache cache = new OkRxCache.Builder()
                 .setCacheDir("111")
-                .using(ApiService.class)
                 .build();
 
 //        ApiService api = new ApiService() {
@@ -65,13 +62,37 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ApiService restApi = new Retrofit.Builder()
+
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(ApiService.URL_BASE)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
-                .build().create(ApiService.class);
+                .build();
 
-        ApiService proxy = cache.create(restApi);
+//        ApiService restApi = retrofit.create(ApiService.class);
+
+        ApiService proxy = cache.create(retrofit,ApiService.class);
+
+//        proxy.getUser(1,1)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(Schedulers.io())
+//                .subscribe(new Subscriber<Response<ResponseBody>>() {
+//                    @Override
+//                    public void onCompleted() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.e("error",e.toString());
+//                    }
+//
+//                    @Override
+//                    public void onNext(Response<ResponseBody> users) {
+//                        Log.e("num","header : "+users.headers());
+//                    }
+//                });
+
 
         proxy.getUsers(1,1)
                 .subscribeOn(Schedulers.io())
@@ -89,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onNext(List<User> users) {
-                        Log.e("num",""+users.toString());
+                        Log.e("num2",""+users.toString());
                     }
                 });
 

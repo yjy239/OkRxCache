@@ -8,7 +8,10 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/RxCache-compiler" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/okexcache-base" />
+            <option value="$PROJECT_DIR$/okrxcache-core" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
