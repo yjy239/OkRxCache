@@ -95,7 +95,8 @@ public class RxCacheProcessor extends AbstractProcessor{
                 System.out.println("getAnnotationMirrors: "+methodSymbol.getAnnotationMirrors()+"\n");
                 System.out.println("getParameters "+methodSymbol.getParameters()+"\n");
                 method.setmMethod(methodSymbol);
-                getAnnations(methodSymbol.getAnnotationMirrors());
+                method.setmAnnonations(getAnnations(methodSymbol.getAnnotationMirrors()));
+                //扫描方法参数中的
                 for(Symbol.VarSymbol var : methodSymbol.getParameters()){
 //                    System.out.println("var "+var.getSimpleName()+" "+var.getAnnotationMirrors()+"\n");
                     for(Attribute.Compound compound : var.getAnnotationMirrors()){
@@ -126,14 +127,40 @@ public class RxCacheProcessor extends AbstractProcessor{
             System.out.println(compound.getElementValues());
             for(Map.Entry<Symbol.MethodSymbol,Attribute> attribute : compound.getElementValues().entrySet()){
 
-                System.out.println("key "+attribute.getKey());
-                specBuilder.addMember(attribute.getKey().toString(),"$S",attribute.getValue());
+                System.out.println("key "+attribute.getKey()+"value "+attribute.getValue());
+                specBuilder = buildAnninationValue(specBuilder,attribute);
+//                specBuilder.addMember(attribute.getKey().toString(),"$S",attribute.getValue());
             }
             annonation.setSpec(specBuilder.build());
+            annonations.add(annonation);
         }
         return annonations;
     }
 
+
+    //根据判断添加
+    private AnnotationSpec.Builder buildAnninationValue(AnnotationSpec.Builder specBuilder,
+                                                        Map.Entry<Symbol.MethodSymbol,Attribute> attribute){
+
+        switch (attribute.getKey().toString()){
+            case "duaration()":
+                specBuilder.addMember(attribute.getKey().toString(),"$L",attribute.getValue());
+                break;
+            case "unit()":
+                ClassName unitName = getClassName(attribute.getValue().toString());
+                specBuilder.addMember(attribute.getKey().toString(),"$T",unitName);
+                break;
+            case "setFromNet()":
+                specBuilder.addMember(attribute.getKey().toString(),"$L",attribute.getValue());
+                break;
+            case "value()":
+                specBuilder.addMember(attribute.getKey().toString(),"$S",attribute.getValue());
+                break;
+        }
+
+
+        return specBuilder;
+    }
 
 
     private ClassName getClassName(String wholeName){
@@ -143,6 +170,7 @@ public class RxCacheProcessor extends AbstractProcessor{
         System.out.println("packageName "+packageName+" SimpleName "+SimpleName);
         return ClassName.get(packageName,SimpleName);
     }
+
 
     //创建所有方法集合
     private List<MethodSpec> getMethodSpecs( List<Symbol.MethodSymbol> methodSymbols){

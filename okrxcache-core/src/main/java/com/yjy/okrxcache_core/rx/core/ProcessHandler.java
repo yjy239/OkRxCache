@@ -77,7 +77,10 @@ public class ProcessHandler<T> implements InvocationHandler {
 
             Observable<Response<ResponseBody>> proxy = null;
             if(method.getName().equals("getUsers")){
-               Method proxyMethod =  mProxy.getClass().getMethod("getUsers",int.class,int.class);
+                Class<?>[] classes = new Class[2];
+                classes[0] = int.class;
+                classes[1]=int.class;
+               Method proxyMethod =  mProxy.getClass().getMethod("getUsers",classes);
                 proxy = (Observable<Response<ResponseBody>>)proxyMethod.invoke(mProxy,objects);
 //                proxy.observeOn(Schedulers.io())
 //                        .subscribeOn(Schedulers.io())

@@ -41,7 +41,7 @@ public interface ApiService {
     @GET("/users")
     Observable<List<User>> getUsers(@Query("since") int lastIdQueried, @Query("per_page") int perPage);
 
-    @Headers({HEADER_API_VERSION})
+    @Headers({HEADER_API_VERSION,"aaaaaa"})
     @GET("/users")
     Observable<Response<ResponseBody>> getUser(@Query("since") int lastIdQueried, @Query("per_page") int perPage);
 }
