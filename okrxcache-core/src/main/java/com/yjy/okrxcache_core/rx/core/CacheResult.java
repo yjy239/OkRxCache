@@ -13,29 +13,40 @@ import com.yjy.okrxcache_core.rx.core.Cache.CacheStrategy;
  */
 
 public class CacheResult<T> {
-    private final T data;
-    private final CacheStrategy source;
+    private final T mData;
+    private final CacheStrategy mSource;
+    private long mCurrentTime;
+    private long mLifeTime;
 
-    public CacheResult(T data, CacheStrategy source) {
-        this.data = data;
-        this.source = source;
+    public CacheResult(T data, CacheStrategy source,long currentTime,long lifeTime) {
+        this.mData = data;
+        this.mSource = source;
+        this.mCurrentTime = currentTime;
+        this.mLifeTime = lifeTime;
 
     }
 
     public T getData() {
-        return data;
+        return mData;
     }
 
     public CacheStrategy getSource() {
-        return source;
+        return mSource;
     }
 
+    public long getmCurrentTime() {
+        return mCurrentTime;
+    }
+
+    public long getmLifeTime() {
+        return mLifeTime;
+    }
 
     @Override
     public String toString() {
         return "Reply{" +
-                "data=" + data +
-                ", source=" + source +
+                "data=" + mData +
+                ", source=" + mSource +
                 '}';
     }
 }

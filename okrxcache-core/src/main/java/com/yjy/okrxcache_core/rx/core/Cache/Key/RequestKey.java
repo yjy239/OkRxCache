@@ -9,23 +9,13 @@ import java.security.MessageDigest;
  */
 
 public class RequestKey implements Key {
-    private static final String EMPTY_LOG_STRING = "";
-    private final String id;
-    private final Key signature;
-    private String stringKey;
-    private int hashCode;
-    private Key originalKey;
+    private final String signature;
 
-    public RequestKey(String id, Key signature, int width, int height) {
-        this.id = id;
-        this.signature = signature;
-    }
-
-    public Key getOriginalKey() {
-        if (originalKey == null) {
-            originalKey = new OriginalKey(id, signature);
+    public RequestKey(String signature) {
+        if (signature == null) {
+            throw new NullPointerException("Signature cannot be null!");
         }
-        return originalKey;
+        this.signature = signature;
     }
 
     @Override
@@ -37,50 +27,26 @@ public class RequestKey implements Key {
             return false;
         }
 
-        RequestKey requestKey = (RequestKey) o;
+        RequestKey that = (RequestKey) o;
 
-        if (!id.equals(requestKey.id)) {
-            return false;
-        } else if (!signature.equals(requestKey.signature)) {
-            return false;
-        }
-
-        return true;
+        return signature.equals(that.signature);
     }
 
     @Override
     public int hashCode() {
-        if (hashCode == 0) {
-            hashCode = id.hashCode();
-            hashCode = 31 * hashCode + signature.hashCode();
-        }
-        return hashCode;
-    }
-
-    @Override
-    public String toString() {
-        if (stringKey == null) {
-            stringKey = new StringBuilder()
-                    .append("RequestKey{")
-                    .append(id)
-                    .append('+')
-                    .append(signature)
-                    .append("+[")
-                    .append("]+")
-                    .append('\'')
-                    .append('}')
-                    .toString();
-        }
-        return stringKey;
+        return signature.hashCode();
     }
 
     @Override
     public void updateDiskCacheKey(MessageDigest messageDigest) throws UnsupportedEncodingException {
-        byte[] dimensions = ByteBuffer.allocate(8)
-                .array();
-        signature.updateDiskCacheKey(messageDigest);
-        messageDigest.update(id.getBytes(STRING_CHARSET_NAME));
-        messageDigest.update(dimensions);
+        messageDigest.update(signature.getBytes(STRING_CHARSET_NAME));
+    }
+
+    @Override
+    public String toString() {
+        return "StringSignature{"
+                + "signature='" + signature + '\''
+                + '}';
     }
 }
 

@@ -113,6 +113,26 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onNext(List<User> users) {
+                        Log.e("User",users.toString());
+                    }
+                });
+
+        proxy.getHouseListByBuilding("12")
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Subscriber<Integer>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("error",e.toString());
+                    }
+
+                    @Override
+                    public void onNext(Integer integer) {
 
                     }
                 });

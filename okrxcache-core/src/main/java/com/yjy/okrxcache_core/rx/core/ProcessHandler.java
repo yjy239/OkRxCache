@@ -9,6 +9,7 @@ import com.google.gson.stream.JsonReader;
 
 import com.yjy.okexcache_base.LifeCache;
 import com.yjy.okrxcache_core.rx.core.Cache.CacheStrategy;
+import com.yjy.okrxcache_core.rx.core.Engine.CacheCallBack;
 import com.yjy.okrxcache_core.rx.core.Utils.Utils;
 
 import java.lang.annotation.Annotation;
@@ -68,6 +69,8 @@ public class ProcessHandler<T> implements InvocationHandler {
                 }
             }
 
+
+
             if(cacheMethod == null){
                 return method.invoke(mUsingClass,objects);
             }
@@ -80,6 +83,7 @@ public class ProcessHandler<T> implements InvocationHandler {
 
             return mCore.start(observable,cacheMethod);
         }
+        Log.e("ProcessHandler0","method "+method.getName()+" objects"+objects[0]);
         return method.invoke(mUsingClass,objects);
     }
 

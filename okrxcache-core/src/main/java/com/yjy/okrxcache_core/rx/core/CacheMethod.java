@@ -2,10 +2,33 @@ package com.yjy.okrxcache_core.rx.core;
 
 
 
+import android.util.Log;
+
 import com.yjy.okexcache_base.LifeCache;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import okhttp3.Headers;
+import okhttp3.MediaType;
+import retrofit2.http.DELETE;
+import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
+import retrofit2.http.HEAD;
+import retrofit2.http.HTTP;
+import retrofit2.http.Multipart;
+import retrofit2.http.OPTIONS;
+import retrofit2.http.PATCH;
+import retrofit2.http.POST;
+import retrofit2.http.PUT;
 
 /**
  * <pre>
@@ -15,22 +38,45 @@ import java.util.concurrent.TimeUnit;
  *     desc   : data which  the Cache Mode of every method or class
  *     version: 1.0
  * </pre>
+ * relativeurl+param's annonation+param+returntype this is key
  */
 
 public class CacheMethod {
     private long mLifeTime;
     private boolean mFromNet;
     private Method mMethod;
+    static final String PARAM = "[a-zA-Z][a-zA-Z0-9_-]*";
+    static final Pattern PARAM_URL_REGEX = Pattern.compile("\\{(" + PARAM + ")\\}");
+    private String mRelativeUrl;
+    private String mParamters="";
+    private String mParamterAnnations="";
+    private String mReturnType = "";
 
 
-    public CacheMethod(long mLifeTime,boolean mFromNet,Method method){
-        this.mLifeTime = mLifeTime;
-        this.mFromNet = mFromNet;
-        this.mMethod = method;
+    public CacheMethod(Builder builder){
+        this.mLifeTime = builder.mLifeTime;
+        this.mFromNet = builder.mFromNet;
+        this.mMethod = builder.mMethod;
+        this.mRelativeUrl = builder.mRelativeUrl;
+        this.mParamters = builder.mParamters;
+        this.mParamterAnnations = builder.mParamterAnnations;
+        this.mReturnType = builder.mReturnType;
     }
 
     public Method getMethod() {
         return mMethod;
+    }
+
+    public String getKey(){
+        return mRelativeUrl+mReturnType+mParamterAnnations+mParamters;
+    }
+
+    public long getLifeTime(){
+        return mLifeTime;
+    }
+
+    public boolean isNetContronller(){
+        return mFromNet;
     }
 
     public static class Builder{
@@ -38,6 +84,12 @@ public class CacheMethod {
         private CacheCore mCore;
         private Method mMethod;
         private boolean mFromNet;
+        private String mRelativeUrl;
+        private Set<String> mRelativeUrlParamNames;
+        private String mHttpMethod;;
+        private String mParamters="";
+        private String mParamterAnnations="";
+        private String mReturnType = "";
 
         public Builder(CacheCore core,Method method){
             this.mCore = core;
@@ -50,9 +102,99 @@ public class CacheMethod {
             TimeUnit unit = life.unit();
             long time = unit.toSeconds(duaration);
             mFromNet = life.setFromNet();
-
-            return new CacheMethod(time,mFromNet,mMethod);
+            
+            parseAnntioans(mMethod);
+            return new CacheMethod(this);
         }
+
+        private void parseAnntioans(Method method){
+            for (Annotation annotation : method.getAnnotations()) {
+                parseMethodAnnotation(annotation);
+            }
+
+            //获取参数的annonation
+            for(Annotation[] annotations : mMethod.getParameterAnnotations()){
+                for(Annotation paramAnnation : annotations){
+                    if(paramAnnation.annotationType() != null){
+//                        Log.e("split",split.toString());
+                        String[] split = paramAnnation.annotationType().toString().split("[.]");
+                        mParamterAnnations = mParamterAnnations+split[split.length-1];
+                    }
+
+                }
+            }
+
+            for(Type type : mMethod.getGenericParameterTypes()){
+                String[] split = type.toString().split("[.]");
+                mParamters = mParamters + split[split.length-1].toString();
+            }
+
+            mReturnType = mMethod.getGenericReturnType().toString();
+
+
+            
+        }
+
+        private void parseMethodAnnotation(Annotation annotation) {
+            if (annotation instanceof DELETE) {
+                parseHttpMethodAndPath("DELETE", ((DELETE) annotation).value(), false);
+            } else if (annotation instanceof GET) {
+                parseHttpMethodAndPath("GET", ((GET) annotation).value(), false);
+            } else if (annotation instanceof HEAD) {
+                parseHttpMethodAndPath("HEAD", ((HEAD) annotation).value(), false);
+            } else if (annotation instanceof PATCH) {
+                parseHttpMethodAndPath("PATCH", ((PATCH) annotation).value(), true);
+            } else if (annotation instanceof POST) {
+                parseHttpMethodAndPath("POST", ((POST) annotation).value(), true);
+            } else if (annotation instanceof PUT) {
+                parseHttpMethodAndPath("PUT", ((PUT) annotation).value(), true);
+            } else if (annotation instanceof OPTIONS) {
+                parseHttpMethodAndPath("OPTIONS", ((OPTIONS) annotation).value(), false);
+            } else if (annotation instanceof HTTP) {
+                HTTP http = (HTTP) annotation;
+                parseHttpMethodAndPath(http.method(), http.path(), http.hasBody());
+            }
+        }
+
+
+        private void parseHttpMethodAndPath(String httpMethod, String value, boolean hasBody) {
+            if (this.mHttpMethod != null) {
+                return;
+            }
+            this.mHttpMethod = httpMethod;
+
+            if (value.isEmpty()) {
+                return;
+            }
+
+            // Get the relative URL path and existing query string, if present.
+            int question = value.indexOf('?');
+            if (question != -1 && question < value.length() - 1) {
+                // Ensure the query string does not have any named parameters.
+                String queryParams = value.substring(question + 1);
+                Matcher queryParamMatcher = PARAM_URL_REGEX.matcher(queryParams);
+                if (queryParamMatcher.find()) {
+                    return;
+                }
+            }
+
+            this.mRelativeUrl = value;
+            this.mRelativeUrlParamNames = parsePathParameters(value);
+        }
+
+        /**
+         * Gets the set of unique path parameters used in the given URI. If a parameter is used twice
+         * in the URI, it will only show up once in the set.
+         */
+        static Set<String> parsePathParameters(String path) {
+            Matcher m = PARAM_URL_REGEX.matcher(path);
+            Set<String> patterns = new LinkedHashSet<>();
+            while (m.find()) {
+                patterns.add(m.group(1));
+            }
+            return patterns;
+        }
+
 
     }
 }

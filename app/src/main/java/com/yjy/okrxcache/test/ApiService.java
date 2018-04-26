@@ -30,6 +30,7 @@ import rx.Observable;
 @AutoCache
 public interface ApiService {
 
+    @LifeCache(duaration = 2,unit = TimeUnit.MINUTES,setFromNet = false)
     @GET("api/zhuzher/projects/buildings/{building_code}/houses")
     Observable<Integer> getHouseListByBuilding(@Path("building_code") String projectCode);
 

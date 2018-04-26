@@ -8,9 +8,13 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.yjy.okrxcache_core.rx.core.Cache.CacheStrategy;
 import com.yjy.okrxcache_core.rx.core.Cache.DisCache.DiskCache;
+import com.yjy.okrxcache_core.rx.core.Cache.Key.EmptySignature;
+import com.yjy.okrxcache_core.rx.core.Cache.Key.Key;
+import com.yjy.okrxcache_core.rx.core.Cache.Key.RequestKey;
 import com.yjy.okrxcache_core.rx.core.CacheMethod;
 import com.yjy.okrxcache_core.rx.core.CacheResult;
 import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.Interceptor;
+import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.RealInterceptorChain;
 import com.yjy.okrxcache_core.rx.core.Utils.Utils;
 
 import java.util.ArrayList;
@@ -18,7 +22,9 @@ import java.util.ArrayList;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 import rx.Observable;
+import rx.Subscriber;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * <pre>
@@ -28,6 +34,7 @@ import rx.functions.Func1;
  *     desc   :the engine of Cache
  *     version: 1.0
  * </pre>
+ * 拦截请求，获取缓存，如果gson转化失败了，直接做一次网络请求
  */
 
 public class CacheEngine {
@@ -35,13 +42,15 @@ public class CacheEngine {
     private ArrayList<Interceptor> mInterceptors = new ArrayList<>();
     private DiskCache.Factory mDiskFactory;
 
+
     public CacheEngine(ArrayList<Interceptor> mInterceptors,DiskCache.Factory diskFactory){
         this.mInterceptors = mInterceptors;
         this.mDiskFactory = diskFactory;
     }
 
     public <T>Observable run(Observable observable, final CacheMethod method){
-
+//        RealInterceptorChain chain = new RealInterceptorChain(mInterceptors,0,request);
+//        Observable chainObservale = chain.process();
         return observable.map(new Func1<Response<ResponseBody>, T>() {
             @Override
             public T call(Response<ResponseBody> responseBodyResponse)  {
@@ -55,9 +64,15 @@ public class CacheEngine {
                     o = (T)adapter.read(jsonReader);
                     Log.e("type",""+o.getClass());
                 }catch (Exception e){
+
                     e.printStackTrace();
                 }
                 return o;
+            }
+        }).onErrorReturn(new Func1() {
+            @Override
+            public Object call(Object o) {
+                return "error";
             }
         }).compose(this.<T>transformeToCacheResult())
                 .map(new Func1<CacheResult<T>, T>() {
@@ -68,14 +83,19 @@ public class CacheEngine {
                 });
     }
 
+
+
     private Observable getDataFromNet(Observable observable){
         return observable;
     }
 
 
     private Observable getDataFromInterceptor(Observable observable){
+
         return observable;
     }
+
+
 
     private <T>Observable.Transformer<T,CacheResult<T>> transformeToCacheResult(){
         return new Observable.Transformer<T, CacheResult<T>>() {
@@ -86,7 +106,7 @@ public class CacheEngine {
                     @Override
                     public CacheResult<T> call(T t) {
                         Log.e("transformeToCacheResult","toResult");
-                        return new CacheResult(1, CacheStrategy.MEMORY) ;
+                        return new CacheResult(t, CacheStrategy.MEMORY,System.currentTimeMillis(),11) ;
                     }
                 });
             }
