@@ -1,4 +1,6 @@
-package com.yjy.okrxcache_core.rx.core.RxInterceptor;
+package com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor;
+
+import com.yjy.okrxcache_core.rx.core.CacheResult;
 
 import java.util.Observable;
 
@@ -18,12 +20,12 @@ public interface Interceptor {
 
     Observable intercept(Chain chain) throws Exception;
 
-    interface Chain{
+    interface Chain<T>{
         void onInterceptor();
 
         Observable request();
 
-        Subscriber process();
+        CacheResult<T> process();
 
     }
 }

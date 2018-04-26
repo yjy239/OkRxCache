@@ -5,12 +5,23 @@ import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
+import com.sun.source.util.Trees;
 import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.processing.JavacProcessingEnvironment;
+import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.TreeMaker;
+import com.sun.tools.javac.tree.TreeTranslator;
+import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.ListBuffer;
+import com.sun.tools.javac.util.Name;
+import com.sun.tools.javac.util.Names;
 import com.yjy.okexcache_base.AutoCache;
 import com.yjy.okexcache_base.LifeCache;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -24,12 +35,19 @@ import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+
+import okhttp3.ResponseBody;
+import retrofit2.Response;
+import retrofit2.http.Header;
+import retrofit2.http.Headers;
+import rx.Observable;
 
 /**
  * <pre>
@@ -41,10 +59,15 @@ import javax.lang.model.element.TypeElement;
  * </pre>
  */
 @AutoService(Processor.class)
+@SupportedAnnotationTypes("*")
 public class RxCacheProcessor extends AbstractProcessor{
 
     private Messager mMessager;
     private Filer filer;
+    private int tally;
+    private Trees trees;
+    private TreeMaker make;
+    private Name.Table names;
 
 
     @Override
@@ -52,6 +75,13 @@ public class RxCacheProcessor extends AbstractProcessor{
         super.init(processingEnvironment);
         mMessager = processingEnvironment.getMessager();
         filer = processingEnvironment.getFiler();
+        trees = Trees.instance(processingEnvironment);
+        Context context = ((JavacProcessingEnvironment)
+                processingEnvironment).getContext();
+        make = TreeMaker.instance(context);
+        names = Names.instance(context).table;//Name.Table.instance(context);
+        tally = 0;
+
     }
 
     @Override
@@ -74,119 +104,72 @@ public class RxCacheProcessor extends AbstractProcessor{
         for(Element e : roundEnvironment.getElementsAnnotatedWith(AutoCache.class)){
 
             System.out.println("location : "+e.getEnclosingElement()+"."+e.getSimpleName());
-            List<Symbol.MethodSymbol> methods = getMethodSymbol(e);
+//            List<RxCacheMethod> methods = getMethodSymbol(e);
 
-
+            createResponseFounction(e);
         }
         return false;
     }
 
-    //获取方法所有信息
-    private List<Symbol.MethodSymbol> getMethodSymbol(Element e){
-        List<Symbol.MethodSymbol> methods = new ArrayList<>();
-        List<? extends Element> elements = e.getEnclosedElements();
-        for(Element child : elements){
-            if(child.getKind() ==  ElementKind.METHOD){
-                System.out.println("------->"+"\n");
-                Symbol.MethodSymbol methodSymbol = (Symbol.MethodSymbol) child;
-                RxCacheMethod method = new RxCacheMethod();
-                String nameMethod = methodSymbol.getSimpleName().toString();
-                System.out.println("name: "+nameMethod+" return"+methodSymbol.getReturnType()+"\n");
-                System.out.println("getAnnotationMirrors: "+methodSymbol.getAnnotationMirrors()+"\n");
-                System.out.println("getParameters "+methodSymbol.getParameters()+"\n");
-                method.setmMethod(methodSymbol);
-                method.setmAnnonations(getAnnations(methodSymbol.getAnnotationMirrors()));
-                //扫描方法参数中的
-                for(Symbol.VarSymbol var : methodSymbol.getParameters()){
-//                    System.out.println("var "+var.getSimpleName()+" "+var.getAnnotationMirrors()+"\n");
-                    for(Attribute.Compound compound : var.getAnnotationMirrors()){
-                        System.out.println( "var "+var.getSimpleName()+" compound.getElementValues "+compound.getElementValues()+" getAnnotationType "+compound.getAnnotationType());
 
-                    }
+    private void createResponseFounction(Element element){
+        System.out.println("--------------------> create start");
+        JCTree jcTree = (JCTree) trees.getTree(element);
 
+        jcTree.accept(new ResponseTree());
+
+        System.out.println("--------------------> create end");
+    }
+
+
+
+    private class ResponseTree extends TreeTranslator{
+
+        @Override
+        public void visitClassDef(JCTree.JCClassDecl jcClassDecl) {
+            jcClassDecl.mods = (JCTree.JCModifiers) this.translate((JCTree) jcClassDecl.mods);
+            jcClassDecl.typarams = this.translateTypeParams(jcClassDecl.typarams);
+            jcClassDecl.extending = (JCTree.JCExpression) this.translate((JCTree) jcClassDecl.extending);
+            jcClassDecl.implementing = this.translate(jcClassDecl.implementing);
+
+            ListBuffer<JCTree> statements = new ListBuffer<>();
+            List<JCTree> oldList = this.translate(jcClassDecl.defs);
+
+
+            for (JCTree jcTree : oldList) {
+
+                //模仿lombok的文件体分析
+                if(jcTree instanceof JCTree.JCMethodDecl){
+                    JCTree.JCMethodDecl method = (JCTree.JCMethodDecl) jcTree;
+                    System.out.println(method);
+                    System.out.println(method.restype);
+                    JCTree.JCExpression observerExp = make.Select(make.Ident(names.fromString("rx")),names.fromString("Observable"));
+                    System.out.println(" id "+observerExp);
+                    //retrofit2.Response
+                    JCTree.JCExpression ResponseExp = make.Select(make.Ident(names.fromString("retrofit2")),names.fromString("Response"));
+                    //okhttp3.ResponseBody
+                    JCTree.JCExpression ResponseBodyExp = make.Select(make.Ident(names.fromString("okhttp3")),names.fromString("ResponseBody"));
+                    JCTree.JCExpression returnExp = make.TypeApply(ResponseExp, com.sun.tools.javac.util.List.<JCTree.JCExpression>of(ResponseBodyExp));
+                    JCTree.JCExpression resultExp = make.TypeApply(observerExp,com.sun.tools.javac.util.List.<JCTree.JCExpression>of(returnExp));
+                    JCTree.JCMethodDecl methodDecl = make.MethodDef(method.getModifiers(),
+                            names.fromString(method.getName()+"$$proxy"),
+                            resultExp,
+                            method.getTypeParameters(),
+                            method.getParameters(),
+                            method.getThrows(),
+                            method.getBody(),
+                            method.defaultValue);
+
+                    statements.append(methodDecl);
                 }
-                System.out.println("getModifiers "+methodSymbol.getModifiers()+"\n");
-                System.out.println("getReceiverType "+methodSymbol.getReceiverType()+"\n");
-                methods.add(methodSymbol);
 
-                System.out.println("------->"+"\n");
+                statements.append(jcTree);
             }
 
+            jcClassDecl.defs = statements.toList(); //更新
+
         }
-        return methods;
-    }
-
-    public List<RxCacheAnnonation> getAnnations(List<Attribute.Compound> compounds){
-        List<RxCacheAnnonation> annonations = new ArrayList<>();
-        for(Attribute.Compound compound : compounds){
-            RxCacheAnnonation annonation = new RxCacheAnnonation();
-            String wholeName = compound.getAnnotationType().toString();
-            ClassName annationClassName = getClassName(wholeName);
-            AnnotationSpec.Builder specBuilder = AnnotationSpec.builder(annationClassName);
-            //注解有多少个注解数值
-            System.out.println(compound.getElementValues());
-            for(Map.Entry<Symbol.MethodSymbol,Attribute> attribute : compound.getElementValues().entrySet()){
-
-                System.out.println("key "+attribute.getKey()+"value "+attribute.getValue());
-                specBuilder = buildAnninationValue(specBuilder,attribute);
-//                specBuilder.addMember(attribute.getKey().toString(),"$S",attribute.getValue());
-            }
-            annonation.setSpec(specBuilder.build());
-            annonations.add(annonation);
-        }
-        return annonations;
     }
 
 
-    //根据判断添加
-    private AnnotationSpec.Builder buildAnninationValue(AnnotationSpec.Builder specBuilder,
-                                                        Map.Entry<Symbol.MethodSymbol,Attribute> attribute){
-
-        switch (attribute.getKey().toString()){
-            case "duaration()":
-                specBuilder.addMember(attribute.getKey().toString(),"$L",attribute.getValue());
-                break;
-            case "unit()":
-                ClassName unitName = getClassName(attribute.getValue().toString());
-                specBuilder.addMember(attribute.getKey().toString(),"$T",unitName);
-                break;
-            case "setFromNet()":
-                specBuilder.addMember(attribute.getKey().toString(),"$L",attribute.getValue());
-                break;
-            case "value()":
-                specBuilder.addMember(attribute.getKey().toString(),"$S",attribute.getValue());
-                break;
-        }
-
-
-        return specBuilder;
-    }
-
-
-    private ClassName getClassName(String wholeName){
-        int lastDot = wholeName.lastIndexOf('.');
-        String packageName = wholeName.substring(0,lastDot);
-        String SimpleName = wholeName.substring(lastDot+1,wholeName.length());
-        System.out.println("packageName "+packageName+" SimpleName "+SimpleName);
-        return ClassName.get(packageName,SimpleName);
-    }
-
-
-    //创建所有方法集合
-    private List<MethodSpec> getMethodSpecs( List<Symbol.MethodSymbol> methodSymbols){
-        List<MethodSpec> mMethodSpecs = new ArrayList<>();
-        for(Symbol.MethodSymbol methodSymbol : methodSymbols){
-//            MethodSpec.methodBuilder(methodSymbol.getSimpleName().toString())
-//                    .addModifiers(Modifier.PUBLIC)
-//                    .addAnnotations().build();
-    }
-        return mMethodSpecs;
-    }
-
-
-
-
-    private void write(){
-
-    }
 }

@@ -20,11 +20,17 @@ import java.util.concurrent.TimeUnit;
 public class CacheMethod {
     private long mLifeTime;
     private boolean mFromNet;
+    private Method mMethod;
 
 
-    public CacheMethod(long mLifeTime,boolean mFromNet){
+    public CacheMethod(long mLifeTime,boolean mFromNet,Method method){
         this.mLifeTime = mLifeTime;
         this.mFromNet = mFromNet;
+        this.mMethod = method;
+    }
+
+    public Method getMethod() {
+        return mMethod;
     }
 
     public static class Builder{
@@ -44,7 +50,8 @@ public class CacheMethod {
             TimeUnit unit = life.unit();
             long time = unit.toSeconds(duaration);
             mFromNet = life.setFromNet();
-            return new CacheMethod(time,mFromNet);
+
+            return new CacheMethod(time,mFromNet,mMethod);
         }
 
     }

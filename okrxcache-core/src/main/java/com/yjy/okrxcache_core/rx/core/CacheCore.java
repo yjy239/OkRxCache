@@ -1,13 +1,25 @@
 package com.yjy.okrxcache_core.rx.core;
 
 
-import com.yjy.okrxcache_core.rx.core.RxInterceptor.Interceptor;
+import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.yjy.okrxcache_core.rx.core.Cache.CacheStrategy;
+import com.yjy.okrxcache_core.rx.core.Cache.DisCache.DiskCache;
+import com.yjy.okrxcache_core.rx.core.Engine.CacheEngine;
+
+import com.yjy.okrxcache_core.rx.core.Utils.Utils;
 
 import java.util.ArrayList;
 
+import okhttp3.ResponseBody;
+import retrofit2.Response;
 import rx.Observable;
 import rx.functions.Func1;
-
+import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.Interceptor;
 /**
  * <pre>
  *     author : yjy
@@ -21,21 +33,21 @@ import rx.functions.Func1;
 public class CacheCore {
 
     private ArrayList<Interceptor> mInterceptors = new ArrayList<>();
+    private CacheEngine mEngine;
+    private DiskCache.Factory mDiskFactory;
 
-    public CacheCore(ArrayList<Interceptor> mInterceptors){
+    public CacheCore(ArrayList<Interceptor> mInterceptors,DiskCache.Factory diskFactory){
         this.mInterceptors = mInterceptors;
+        this.mDiskFactory = diskFactory;
+        mEngine = new CacheEngine(mInterceptors,mDiskFactory);
     }
 
-    public <T> Observable<CacheResult<T>> loadResource(Observable<T> observable){
-        return observable.map(new Func1<T, CacheResult<T>>() {
-            @Override
-            public CacheResult<T> call(T t) {
-                return null;
-            }
-        });
+
+    //
+    public <T>Observable start(Observable observable,final CacheMethod method){
+        return mEngine.run(observable,method);
     }
 
-    public void start(){
 
-    }
+
 }

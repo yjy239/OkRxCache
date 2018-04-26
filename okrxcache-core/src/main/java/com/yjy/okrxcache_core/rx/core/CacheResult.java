@@ -15,12 +15,11 @@ import com.yjy.okrxcache_core.rx.core.Cache.CacheStrategy;
 public class CacheResult<T> {
     private final T data;
     private final CacheStrategy source;
-    private final boolean isEncrypted;
 
-    public CacheResult(T data, CacheStrategy source, boolean isEncrypted) {
+    public CacheResult(T data, CacheStrategy source) {
         this.data = data;
         this.source = source;
-        this.isEncrypted = isEncrypted;
+
     }
 
     public T getData() {
@@ -31,16 +30,12 @@ public class CacheResult<T> {
         return source;
     }
 
-    public boolean isEncrypted() {
-        return isEncrypted;
-    }
 
     @Override
     public String toString() {
         return "Reply{" +
                 "data=" + data +
                 ", source=" + source +
-                ", isEncrypted=" + isEncrypted +
                 '}';
     }
 }

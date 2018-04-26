@@ -11,5 +11,7 @@ package com.yjy.okrxcache_core.rx.core.Cache;
  */
 
 public enum CacheStrategy {
-    DISK,MEMORY
+    MEMORY,NETWORK
+
+
 }

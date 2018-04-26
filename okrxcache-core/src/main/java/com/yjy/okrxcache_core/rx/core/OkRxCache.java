@@ -1,21 +1,15 @@
 package com.yjy.okrxcache_core.rx.core;
 
-import android.util.Log;
+import android.content.Context;
 
-import com.yjy.okrxcache_core.rx.core.RxInterceptor.Interceptor;
-import com.yjy.okrxcache_core.rx.core.RxInterceptor.MemoryInterceptor;
+import com.yjy.okrxcache_core.rx.core.Cache.DisCache.DiskCache;
+import com.yjy.okrxcache_core.rx.core.Cache.DisCache.DiskLruCache;
+import com.yjy.okrxcache_core.rx.core.Cache.DisCache.InternalCacheDiskCacheFactory;
+import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.Interceptor;
+import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.MemoryInterceptor;
 
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-
-import okhttp3.Cache;
-import retrofit2.Retrofit;
-import rx.Observable;
-import rx.Scheduler;
-import rx.Subscriber;
-import rx.functions.Func0;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 /**
  * <pre>
@@ -34,6 +28,7 @@ public class OkRxCache {
     private Class<?> mUsingClass;
     private CacheCore mCore;
 
+
     public OkRxCache(Builder builder){
         this.mBuilder = builder;
         this.mDirPath = builder.mFilePath;
@@ -44,20 +39,9 @@ public class OkRxCache {
 
     //(T)Proxy.newProxyInstance(orgin.getClass().getClassLoader(),new Class<?>[]{mUsingClass},handler)
     //此处为核心。我们将开始动态代理
-    public <T>T create(Retrofit retrofit,Class<?> mUsingClass){
-        String clsname = mUsingClass.getCanonicalName()+"$$Binding";
-//        Log.e("clsname",clsname+" "+mUsingClass.getCanonicalName());
-        Class<?> clsproxy = null;
-        try {
-            clsproxy = Class.forName(clsname);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        T orgin = (T)retrofit.create(mUsingClass);
+    public <T>T create(Object orgin){
 
-        Object proxy = retrofit.create(clsproxy);
-
-        ProcessHandler handler = new ProcessHandler(orgin,proxy,mCore);
+        ProcessHandler handler = new ProcessHandler(orgin,mCore);
 
         return (T)Proxy.newProxyInstance(orgin.getClass().getClassLoader(),new Class<?>[]{mUsingClass},handler);
     }
@@ -68,7 +52,9 @@ public class OkRxCache {
         private Class<?> mUsingClass;
         private CacheCore mCore;
         private ArrayList<Interceptor> mInterceptors = new ArrayList<>();
-
+        private DiskCache.Factory mDiskCacheFactory;
+        private Context mContext;
+        private int mDiskSize = 0;
 
         public Builder setCacheDir(String filePath){
             this.mFilePath = filePath;
@@ -85,10 +71,20 @@ public class OkRxCache {
             return this;
         }
 
+        public Builder with(Context context){
+            this.mContext = context;
+            return this;
+        }
+
+        public Builder size(int diskSize){
+            this.mDiskSize = diskSize;
+            return this;
+        }
+
         public OkRxCache build(){
 
-            mInterceptors.add(new MemoryInterceptor());
-            mCore = new CacheCore(mInterceptors);
+            mDiskCacheFactory = new InternalCacheDiskCacheFactory(mContext,mFilePath,mDiskSize);
+            mCore = new CacheCore(mInterceptors,mDiskCacheFactory);
             return new OkRxCache(this);
         }
 

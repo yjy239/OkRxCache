@@ -9,6 +9,8 @@ import com.yjy.okrxcache_core.rx.core.OkRxCache;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -26,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
         OkRxCache cache = new OkRxCache.Builder()
                 .setCacheDir("111")
+                .using(ApiService.class)
                 .build();
 
 //        ApiService api = new ApiService() {
@@ -69,9 +72,9 @@ public class MainActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-//        ApiService restApi = retrofit.create(ApiService.class);
+        ApiService restApi = retrofit.create(ApiService.class);
 
-        ApiService proxy = cache.create(retrofit,ApiService.class);
+        ApiService proxy = cache.create(restApi);
 
 //        proxy.getUser(1,1)
 //                .subscribeOn(Schedulers.io())
@@ -105,12 +108,12 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e("error",e.toString());
+
                     }
 
                     @Override
                     public void onNext(List<User> users) {
-                        Log.e("num2",""+users.toString());
+
                     }
                 });
 
