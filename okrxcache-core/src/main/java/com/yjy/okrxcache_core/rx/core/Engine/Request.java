@@ -1,6 +1,9 @@
 package com.yjy.okrxcache_core.rx.core.Engine;
 
 import com.yjy.okrxcache_core.rx.core.Cache.Key.Key;
+import com.yjy.okrxcache_core.rx.core.CacheMethod;
+
+import java.lang.reflect.Method;
 
 import rx.Observable;
 
@@ -24,6 +27,8 @@ public class Request<T> {
     private boolean interceptor = false;
 
     private Observable observable;
+
+    private CacheMethod mMethod;
 
     public Key getKey() {
         return key;
@@ -55,5 +60,13 @@ public class Request<T> {
 
     public void setObservable(Observable observable) {
         this.observable = observable;
+    }
+
+    public CacheMethod getMethod() {
+        return mMethod;
+    }
+
+    public void setMethod(CacheMethod mMethod) {
+        this.mMethod = mMethod;
     }
 }

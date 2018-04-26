@@ -24,5 +24,5 @@ public @interface LifeCache {
 
     TimeUnit unit();
 
-    boolean setFromNet();
+    boolean setFromNet() default false;
 }

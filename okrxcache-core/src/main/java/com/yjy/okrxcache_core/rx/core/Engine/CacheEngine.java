@@ -48,9 +48,13 @@ public class CacheEngine {
         this.mDiskFactory = diskFactory;
     }
 
-    public <T>Observable run(Observable observable, final CacheMethod method){
-//        RealInterceptorChain chain = new RealInterceptorChain(mInterceptors,0,request);
-//        Observable chainObservale = chain.process();
+    public <T>Observable run(Observable observable, final Request request){
+        RealInterceptorChain chain = new RealInterceptorChain(mInterceptors,0,request);
+        Observable chainObservale = chain.process();
+        return chainObservale;
+    }
+
+    private <T>Observable test(Observable observable,final Request request){
         return observable.map(new Func1<Response<ResponseBody>, T>() {
             @Override
             public T call(Response<ResponseBody> responseBodyResponse)  {
@@ -58,7 +62,8 @@ public class CacheEngine {
                 Log.e("header",responseBodyResponse.headers()+"");
                 Gson gson = new Gson();
                 JsonReader jsonReader = gson.newJsonReader(responseBodyResponse.body().charStream());
-                TypeAdapter adapter = gson.getAdapter(TypeToken.get(Utils.getReturnType(method.getMethod().getGenericReturnType())));
+                TypeAdapter adapter = gson.getAdapter(TypeToken.get(Utils.getReturnType(request
+                        .getMethod().getMethod().getGenericReturnType())));
                 T o = null;
                 try {
                     o = (T)adapter.read(jsonReader);
@@ -83,20 +88,6 @@ public class CacheEngine {
                 });
     }
 
-
-
-    private Observable getDataFromNet(Observable observable){
-        return observable;
-    }
-
-
-    private Observable getDataFromInterceptor(Observable observable){
-
-        return observable;
-    }
-
-
-
     private <T>Observable.Transformer<T,CacheResult<T>> transformeToCacheResult(){
         return new Observable.Transformer<T, CacheResult<T>>() {
             @Override
@@ -112,6 +103,22 @@ public class CacheEngine {
             }
         };
     }
+
+
+
+    private Observable getDataFromNet(Observable observable){
+        return observable;
+    }
+
+
+    private Observable getDataFromInterceptor(Observable observable){
+
+        return observable;
+    }
+
+
+
+
 
 
 }

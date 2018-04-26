@@ -16,10 +16,10 @@ public class MemoryInterceptor implements Interceptor {
     @Override
     public Observable intercept(Interceptor.Chain chain) {
         Log.e("MemoryInterceptor","MemoryInterceptor");
-//        Observable observable = chain.request();
-//
-//        chain.process();
+        chain.request();
 
-        return null;
+
+
+        return chain.process();
     }
 }

@@ -1,31 +1,21 @@
 package com.yjy.okrxcache_core.rx.core;
 
 
-import android.util.Log;
-
-import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.yjy.okrxcache_core.rx.core.Cache.CacheStrategy;
 import com.yjy.okrxcache_core.rx.core.Cache.DisCache.DiskCache;
 import com.yjy.okrxcache_core.rx.core.Cache.Key.EmptySignature;
 import com.yjy.okrxcache_core.rx.core.Cache.Key.Key;
 import com.yjy.okrxcache_core.rx.core.Cache.Key.RequestKey;
 import com.yjy.okrxcache_core.rx.core.Engine.CacheEngine;
 
-import com.yjy.okrxcache_core.rx.core.Engine.EngineCallBack;
 import com.yjy.okrxcache_core.rx.core.Engine.Request;
 import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.DiskInterceptor;
 import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.MemoryInterceptor;
-import com.yjy.okrxcache_core.rx.core.Utils.Utils;
+import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.NetWorkInterceptor;
 
 import java.util.ArrayList;
 
-import okhttp3.ResponseBody;
-import retrofit2.Response;
 import rx.Observable;
-import rx.functions.Func1;
+
 import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.Interceptor;
 /**
  * <pre>
@@ -37,7 +27,7 @@ import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.Interceptor;
  * </pre>
  */
 
-public class CacheCore implements EngineCallBack{
+public class CacheCore {
 
     private ArrayList<Interceptor> mInterceptors = new ArrayList<>();
     private CacheEngine mEngine;
@@ -50,6 +40,7 @@ public class CacheCore implements EngineCallBack{
         this.mDiskFactory = diskFactory;
         mInterceptors.add(new MemoryInterceptor());
         mInterceptors.add(new DiskInterceptor());
+        mInterceptors.add(new NetWorkInterceptor());
         mEngine = new CacheEngine(mInterceptors,mDiskFactory);
     }
 
@@ -66,19 +57,12 @@ public class CacheCore implements EngineCallBack{
         Request request = new Request();
         request.setKey(key);
         request.setObservable(observable);
+        request.setMethod(method);
 
-        return mEngine.run(observable,method);
-
-
-
+        return mEngine.run(observable,request);
 
     }
 
 
 
-
-    @Override
-    public Observable getResult() {
-        return null;
-    }
 }

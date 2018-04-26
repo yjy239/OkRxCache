@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
 //                });
 
 
-        proxy.getUsers(1,1)
+        proxy.getUsers(2,1)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(new Subscriber<List<User>>() {

@@ -2,36 +2,14 @@ package com.yjy.okrxcache_core.rx.core;
 
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-
 import com.yjy.okexcache_base.LifeCache;
-import com.yjy.okrxcache_core.rx.core.Cache.CacheStrategy;
-import com.yjy.okrxcache_core.rx.core.Engine.CacheCallBack;
-import com.yjy.okrxcache_core.rx.core.Utils.Utils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
-import java.util.ArrayList;
 import java.util.HashMap;
 
-import okhttp3.ResponseBody;
-import retrofit2.Response;
-import retrofit2.adapter.rxjava.Result;
-import rx.Completable;
 import rx.Observable;
-import rx.Single;
-import rx.Subscriber;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
-
-import static com.google.gson.internal.$Gson$Types.getRawType;
 
 /**
  * <pre>
@@ -64,11 +42,10 @@ public class ProcessHandler<T> implements InvocationHandler {
         if(method.getReturnType() == Observable.class){
             for(Annotation annotation : method.getDeclaredAnnotations()){
                 if(annotation instanceof LifeCache){
-                    cacheMethod = loadCacheMethod(method);
+                    cacheMethod = loadCacheMethod(method,objects);
                     break;
                 }
             }
-
 
 
             if(cacheMethod == null){
@@ -91,7 +68,7 @@ public class ProcessHandler<T> implements InvocationHandler {
 
 
 
-    private CacheMethod loadCacheMethod(Method method){
+    private CacheMethod loadCacheMethod(Method method,Object[] objs){
         CacheMethod result = mCacheMethodMap.get(method);
         if(result != null){
             return result;
@@ -100,7 +77,7 @@ public class ProcessHandler<T> implements InvocationHandler {
         synchronized (mCacheMethodMap){
             result = mCacheMethodMap.get(method);
             if (result == null) {
-                result = new CacheMethod.Builder(mCore, method).build();
+                result = new CacheMethod.Builder(mCore, method,objs).build();
                 mCacheMethodMap.put(method, result);
             }
 

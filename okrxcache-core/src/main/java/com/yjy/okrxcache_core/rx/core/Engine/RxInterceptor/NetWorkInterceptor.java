@@ -27,9 +27,56 @@ import rx.functions.Func1;
 
 public class NetWorkInterceptor<T> implements Interceptor {
     @Override
-    public Observable intercept(Chain chain) {
+    public Observable intercept(final Chain chain) {
 
-        return  null;
+        Log.e("NetWorkInterceptor","NetWorkInterceptor");
+        return  chain.request().getObservable().map(new Func1<Response<ResponseBody>, T>() {
+            @Override
+            public T call(Response<ResponseBody> responseBodyResponse)  {
+                //可能需要处理无法用gosn转化的对象
+                Log.e("header",responseBodyResponse.headers()+"");
+                Gson gson = new Gson();
+                JsonReader jsonReader = gson.newJsonReader(responseBodyResponse.body().charStream());
+                TypeAdapter adapter = gson.getAdapter(TypeToken.get(Utils.getReturnType(chain.request()
+                        .getMethod().getMethod().getGenericReturnType())));
+                T o = null;
+                try {
+                    o = (T)adapter.read(jsonReader);
+                    Log.e("type",""+o.getClass());
+                }catch (Exception e){
+
+                    e.printStackTrace();
+                }
+                return o;
+            }
+        }).onErrorReturn(new Func1() {
+            @Override
+            public Object call(Object o) {
+                return "error";
+            }
+        }).compose(this.<T>transformeToCacheResult())
+                .map(new Func1<CacheResult<T>, T>() {
+                    @Override
+                    public T call(CacheResult<T> tCacheResult) {
+                        return tCacheResult.getData();
+                    }
+                });
+    }
+
+    private <T>Observable.Transformer<T,CacheResult<T>> transformeToCacheResult(){
+        return new Observable.Transformer<T, CacheResult<T>>() {
+            @Override
+            public Observable<CacheResult<T>> call(Observable<T> tObservable) {
+
+                return tObservable.map(new Func1<T, CacheResult<T>>() {
+                    @Override
+                    public CacheResult<T> call(T t) {
+                        Log.e("transformeToCacheResult","toResult");
+                        return new CacheResult(t, CacheStrategy.MEMORY,System.currentTimeMillis(),11) ;
+                    }
+                });
+            }
+        };
     }
 
 

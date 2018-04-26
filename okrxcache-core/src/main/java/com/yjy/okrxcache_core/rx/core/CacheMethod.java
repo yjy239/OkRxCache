@@ -51,6 +51,7 @@ public class CacheMethod {
     private String mParamters="";
     private String mParamterAnnations="";
     private String mReturnType = "";
+    private String mObjectString="";
 
 
     public CacheMethod(Builder builder){
@@ -61,6 +62,8 @@ public class CacheMethod {
         this.mParamters = builder.mParamters;
         this.mParamterAnnations = builder.mParamterAnnations;
         this.mReturnType = builder.mReturnType;
+        this.mObjectString = builder.mObjectString;
+        Log.e("mObjectString",mObjectString);
     }
 
     public Method getMethod() {
@@ -68,7 +71,7 @@ public class CacheMethod {
     }
 
     public String getKey(){
-        return mRelativeUrl+mReturnType+mParamterAnnations+mParamters;
+        return mRelativeUrl+mReturnType+mParamterAnnations+mParamters+mObjectString;
     }
 
     public long getLifeTime(){
@@ -90,10 +93,13 @@ public class CacheMethod {
         private String mParamters="";
         private String mParamterAnnations="";
         private String mReturnType = "";
+        private Object[] mParamterObjects;
+        private String mObjectString="";
 
-        public Builder(CacheCore core,Method method){
+        public Builder(CacheCore core,Method method,Object[] objects){
             this.mCore = core;
             this.mMethod = method;
+            this.mParamterObjects = objects;
         }
 
         public CacheMethod build(){
@@ -131,6 +137,12 @@ public class CacheMethod {
 
             mReturnType = mMethod.getGenericReturnType().toString();
 
+            if(mParamterObjects!=null&&mParamterObjects.length>0){
+                for(Object o : mParamterObjects){
+                    mObjectString = mObjectString+o.toString();
+                }
+
+            }
 
             
         }
