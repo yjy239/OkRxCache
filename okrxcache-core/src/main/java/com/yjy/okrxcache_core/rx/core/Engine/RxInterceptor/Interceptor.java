@@ -19,9 +19,13 @@ import rx.Subscriber;
 
 public interface Interceptor {
 
+
     Observable intercept(Interceptor.Chain chain);
 
+    void setMode(int mode);
+
     interface Chain<T>{
+
 
         Request request();
 

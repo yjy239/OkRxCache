@@ -6,8 +6,6 @@ import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import com.yjy.okrxcache_core.rx.core.Cache.CacheStrategy;
-import com.yjy.okrxcache_core.rx.core.CacheResult;
 import com.yjy.okrxcache_core.rx.core.Utils.Utils;
 
 import okhttp3.ResponseBody;
@@ -20,12 +18,19 @@ import rx.functions.Func1;
  *     author : yjy
  *     e-mail : yujunyu12@gmail.com
  *     time   : 2018/04/26
- *     desc   :
+ *     desc   :interceptor for network
  *     version: 1.0
  * </pre>
  */
 
 public class NetWorkInterceptor<T> implements Interceptor {
+    private int mCacheStagry = 0;
+    private int mMode = 0;
+
+    public NetWorkInterceptor(){
+
+    }
+
     @Override
     public Observable intercept(final Chain chain) {
 
@@ -54,29 +59,12 @@ public class NetWorkInterceptor<T> implements Interceptor {
             public Object call(Object o) {
                 return "error";
             }
-        }).compose(this.<T>transformeToCacheResult())
-                .map(new Func1<CacheResult<T>, T>() {
-                    @Override
-                    public T call(CacheResult<T> tCacheResult) {
-                        return tCacheResult.getData();
-                    }
-                });
+        });
     }
 
-    private <T>Observable.Transformer<T,CacheResult<T>> transformeToCacheResult(){
-        return new Observable.Transformer<T, CacheResult<T>>() {
-            @Override
-            public Observable<CacheResult<T>> call(Observable<T> tObservable) {
-
-                return tObservable.map(new Func1<T, CacheResult<T>>() {
-                    @Override
-                    public CacheResult<T> call(T t) {
-                        Log.e("transformeToCacheResult","toResult");
-                        return new CacheResult(t, CacheStrategy.MEMORY,System.currentTimeMillis(),11) ;
-                    }
-                });
-            }
-        };
+    @Override
+    public void setMode(int mode) {
+        this.mMode = mode;
     }
 
 

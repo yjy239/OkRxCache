@@ -8,6 +8,7 @@ package com.yjy.okrxcache_core.rx.core.Cache.DisCache;
 import com.yjy.okrxcache_core.rx.core.Cache.Key.Key;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * An interface for writing to and reading from a disk cache.
@@ -69,7 +70,7 @@ public interface DiskCache {
      *
      * @param key The key to remove.
      */
-    void delete(Key key);
+    void delete(Key key) throws IOException;
 
     /**
      * Clear the cache.

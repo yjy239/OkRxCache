@@ -26,11 +26,13 @@ public class RealInterceptorChain<T> implements Interceptor.Chain {
     private Request mRequest;
     private int mIndex;
     private Observable mObservale;
+    private int mMode = 0;
 
-    public RealInterceptorChain(List<Interceptor> interceptors,int index, Request request){
+    public RealInterceptorChain(List<Interceptor> interceptors,int index, Request request,int mode){
         this.mInterceptors = interceptors;
         this.mRequest = request;
         this.mIndex = index;
+        this.mMode = mode;
     }
 
 
@@ -39,13 +41,18 @@ public class RealInterceptorChain<T> implements Interceptor.Chain {
         return mRequest;
     }
 
+    /**
+     * 拦截器启动运行
+     * @return
+     */
     @Override
     public Observable process() {
         if(mRequest.isInterceptor()||mInterceptors.size()<=mIndex){
             return mRequest.getObservable();
         }
-        RealInterceptorChain next = new RealInterceptorChain(mInterceptors,mIndex+1,mRequest);
+        RealInterceptorChain next = new RealInterceptorChain(mInterceptors,mIndex+1,mRequest,mMode);
         Interceptor interceptor = mInterceptors.get(mIndex);
+        interceptor.setMode(mMode);
         try {
             mObservale = interceptor.intercept(next);
         }catch (Exception e){

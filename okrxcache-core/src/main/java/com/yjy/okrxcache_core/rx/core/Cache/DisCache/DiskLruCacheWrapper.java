@@ -112,15 +112,11 @@ public class DiskLruCacheWrapper implements DiskCache {
     }
 
     @Override
-    public void delete(Key key) {
+    public void delete(Key key) throws IOException{
         String safeKey = safeKeyGenerator.getSafeKey(key);
-        try {
-            getDiskCache().remove(safeKey);
-        } catch (IOException e) {
-            if (Log.isLoggable(TAG, Log.WARN)) {
-                Log.w(TAG, "Unable to delete from disk cache", e);
-            }
-        }
+
+        getDiskCache().remove(safeKey);
+
     }
 
     @Override

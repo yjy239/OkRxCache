@@ -1,7 +1,5 @@
 package com.yjy.okrxcache_core.rx.core;
 
-import com.yjy.okrxcache_core.rx.core.Cache.CacheStrategy;
-
 /**
  * <pre>
  *     author : yjy
@@ -14,13 +12,13 @@ import com.yjy.okrxcache_core.rx.core.Cache.CacheStrategy;
 
 public class CacheResult<T> {
     private final T mData;
-    private final CacheStrategy mSource;
+//    private final CacheStrategy mSource;
     private long mCurrentTime;
     private long mLifeTime;
 
-    public CacheResult(T data, CacheStrategy source,long currentTime,long lifeTime) {
+    public CacheResult(T data,long currentTime,long lifeTime) {
         this.mData = data;
-        this.mSource = source;
+
         this.mCurrentTime = currentTime;
         this.mLifeTime = lifeTime;
 
@@ -30,9 +28,9 @@ public class CacheResult<T> {
         return mData;
     }
 
-    public CacheStrategy getSource() {
-        return mSource;
-    }
+//    public CacheStrategy getSource() {
+//        return mSource;
+//    }
 
     public long getmCurrentTime() {
         return mCurrentTime;
@@ -46,7 +44,8 @@ public class CacheResult<T> {
     public String toString() {
         return "Reply{" +
                 "data=" + mData +
-                ", source=" + mSource +
+                ", mLifeTime=" + mLifeTime +
                 '}';
     }
+
 }

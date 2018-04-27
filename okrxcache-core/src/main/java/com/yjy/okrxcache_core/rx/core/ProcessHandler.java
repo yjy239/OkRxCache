@@ -21,7 +21,7 @@ import rx.Observable;
  * </pre>
  */
 
-public class ProcessHandler<T> implements InvocationHandler {
+class ProcessHandler<T> implements InvocationHandler {
     private Object mUsingClass;
     private CacheCore mCore;
     private HashMap<Method,CacheMethod> mCacheMethodMap = new HashMap<>();
@@ -80,8 +80,9 @@ public class ProcessHandler<T> implements InvocationHandler {
                 result = new CacheMethod.Builder(mCore, method,objs).build();
                 mCacheMethodMap.put(method, result);
             }
-
         }
+
+        result.process(objs);
         return result;
     }
 

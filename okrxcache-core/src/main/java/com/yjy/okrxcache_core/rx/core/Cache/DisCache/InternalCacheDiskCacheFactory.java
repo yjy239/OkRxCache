@@ -34,16 +34,19 @@ public final class InternalCacheDiskCacheFactory extends DiskLruCacheFactory {
         super(new CacheDirectoryGetter() {
             @Override
             public File getCacheDirectory() {
-                File cacheDirectory = context.getCacheDir();
+                File cacheDirectory = null;
+
 
                 if(fileDir != null){
                     cacheDirectory = new File(fileDir);
+                }else {
+                    cacheDirectory = context.getCacheDir();
+                    if (diskCacheName != null) {
+                        return new File(cacheDirectory, diskCacheName);
+                    }
                 }
                 if (cacheDirectory == null) {
                     return null;
-                }
-                if (diskCacheName != null) {
-                    return new File(cacheDirectory, diskCacheName);
                 }
 
                 return cacheDirectory;

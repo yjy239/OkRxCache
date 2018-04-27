@@ -82,6 +82,14 @@ public class CacheMethod {
         return mFromNet;
     }
 
+    public void process(Object[] objects){
+        if(objects!=null&&objects.length>0){
+            for(Object o : objects){
+                mObjectString = mObjectString+o.toString();
+            }
+        }
+    }
+
     public static class Builder{
         private long mLifeTime;
         private CacheCore mCore;

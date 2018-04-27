@@ -5,11 +5,18 @@ import android.content.Context;
 import com.yjy.okrxcache_core.rx.core.Cache.DisCache.DiskCache;
 import com.yjy.okrxcache_core.rx.core.Cache.DisCache.DiskLruCache;
 import com.yjy.okrxcache_core.rx.core.Cache.DisCache.InternalCacheDiskCacheFactory;
+import com.yjy.okrxcache_core.rx.core.Convert.GsonConvert;
+import com.yjy.okrxcache_core.rx.core.Convert.IConvert;
+import com.yjy.okrxcache_core.rx.core.Engine.InterceptorMode;
 import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.Interceptor;
 import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.MemoryInterceptor;
 
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
 
 /**
  * <pre>
@@ -46,6 +53,33 @@ public class OkRxCache {
         return (T)Proxy.newProxyInstance(orgin.getClass().getClassLoader(),new Class<?>[]{mUsingClass},handler);
     }
 
+    public String getKey(){
+        return "";
+    }
+
+    public  Observable<CacheResult> get(String key){
+        Observable orgin = Observable.just(key);
+        return mCore.operator(orgin,key,InterceptorMode.GET);
+    }
+
+
+    public  Observable<Boolean> put(String key, Object data){
+        CacheResult cacheResult = new CacheResult(data,System.currentTimeMillis(),111);
+        Observable orgin = Observable.just(cacheResult);
+        return mCore.operator(orgin,key, InterceptorMode.SAVE);
+    }
+
+
+    public rx.Observable clear(String key){
+        Observable orgin = Observable.just(key);
+        return mCore.operator(orgin,key,InterceptorMode.CLEAR);
+    }
+
+    public rx.Observable remove(String key){
+        Observable orgin = Observable.just(key);
+        return mCore.operator(orgin,key,InterceptorMode.REMOVE);
+    }
+
 
     public static class Builder{
         private String mFilePath;
@@ -55,6 +89,9 @@ public class OkRxCache {
         private DiskCache.Factory mDiskCacheFactory;
         private Context mContext;
         private int mDiskSize = 0;
+        private IConvert mConvert = new GsonConvert();
+        private int mCacheStagry = 0;
+
 
         public Builder setCacheDir(String filePath){
             this.mFilePath = filePath;
@@ -81,10 +118,23 @@ public class OkRxCache {
             return this;
         }
 
+        public Builder setConvert(IConvert convert){
+            this.mConvert = convert;
+            return this;
+        }
+
+        public Builder setStragry(int cacheStagry){
+            this.mCacheStagry = cacheStagry;
+            return this;
+        }
+
+
+
         public OkRxCache build(){
 
             mDiskCacheFactory = new InternalCacheDiskCacheFactory(mContext,mFilePath,mDiskSize);
-            mCore = new CacheCore(mInterceptors,mDiskCacheFactory);
+            mCore = new CacheCore(mInterceptors,mDiskCacheFactory,
+                    mConvert,mCacheStagry);
             return new OkRxCache(this);
         }
 
