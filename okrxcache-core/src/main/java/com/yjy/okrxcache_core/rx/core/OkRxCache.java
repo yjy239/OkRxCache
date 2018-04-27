@@ -2,6 +2,7 @@ package com.yjy.okrxcache_core.rx.core;
 
 import android.content.Context;
 
+import com.yjy.okrxcache_core.rx.core.Cache.CacheStragry;
 import com.yjy.okrxcache_core.rx.core.Cache.DisCache.DiskCache;
 import com.yjy.okrxcache_core.rx.core.Cache.DisCache.DiskLruCache;
 import com.yjy.okrxcache_core.rx.core.Cache.DisCache.InternalCacheDiskCacheFactory;
@@ -57,12 +58,23 @@ public class OkRxCache {
         return "";
     }
 
+    /**
+     * 通过key获取结果
+     * @param key
+     * @return
+     */
     public  Observable<CacheResult> get(String key){
         Observable orgin = Observable.just(key);
         return mCore.operator(orgin,key,InterceptorMode.GET);
     }
 
 
+    /**
+     * 将结果通过key保存在disk
+     * @param key
+     * @param data
+     * @return
+     */
     public  Observable<Boolean> put(String key, Object data){
         CacheResult cacheResult = new CacheResult(data,System.currentTimeMillis(),111);
         Observable orgin = Observable.just(cacheResult);
@@ -70,11 +82,21 @@ public class OkRxCache {
     }
 
 
+    /**
+     * 清空缓存
+     * @param key
+     * @return
+     */
     public rx.Observable clear(String key){
         Observable orgin = Observable.just(key);
         return mCore.operator(orgin,key,InterceptorMode.CLEAR);
     }
 
+    /**
+     * 清除key对应的缓存
+     * @param key
+     * @return
+     */
     public rx.Observable remove(String key){
         Observable orgin = Observable.just(key);
         return mCore.operator(orgin,key,InterceptorMode.REMOVE);
@@ -90,7 +112,7 @@ public class OkRxCache {
         private Context mContext;
         private int mDiskSize = 0;
         private IConvert mConvert = new GsonConvert();
-        private int mCacheStagry = 0;
+        private CacheStragry mCacheStagry = CacheStragry.ALL;
 
 
         public Builder setCacheDir(String filePath){
@@ -123,7 +145,7 @@ public class OkRxCache {
             return this;
         }
 
-        public Builder setStragry(int cacheStagry){
+        public Builder setStragry(CacheStragry cacheStagry){
             this.mCacheStagry = cacheStagry;
             return this;
         }

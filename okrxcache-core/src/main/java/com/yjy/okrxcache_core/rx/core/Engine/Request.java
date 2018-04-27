@@ -13,7 +13,7 @@ import rx.Observable;
  *     author : yjy
  *     e-mail : yujunyu12@gmail.com
  *     time   : 2018/04/26
- *     desc   :
+ *     desc   :数据流包裹类
  *     version: 1.0
  * </pre>
  */

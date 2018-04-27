@@ -120,15 +120,15 @@ public class DiskLruCacheWrapper implements DiskCache {
     }
 
     @Override
-    public synchronized void clear() {
-        try {
+    public synchronized void clear() throws IOException{
+//        try {
             getDiskCache().delete();
             resetDiskCache();
-        }  catch (IOException e) {
-            if (Log.isLoggable(TAG, Log.WARN)) {
-                Log.w(TAG, "Unable to clear disk cache", e);
-            }
-        }
+//        }  catch (IOException e) {
+//            if (Log.isLoggable(TAG, Log.WARN)) {
+//                Log.w(TAG, "Unable to clear disk cache", e);
+//            }
+//        }
     }
 }
 

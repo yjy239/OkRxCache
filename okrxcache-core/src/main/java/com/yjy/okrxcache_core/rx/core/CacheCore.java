@@ -1,6 +1,7 @@
 package com.yjy.okrxcache_core.rx.core;
 
 
+import com.yjy.okrxcache_core.rx.core.Cache.CacheStragry;
 import com.yjy.okrxcache_core.rx.core.Cache.DisCache.DiskCache;
 import com.yjy.okrxcache_core.rx.core.Cache.Key.EmptySignature;
 import com.yjy.okrxcache_core.rx.core.Cache.Key.Key;
@@ -47,7 +48,7 @@ class CacheCore {
 
 
     public CacheCore(ArrayList<Interceptor> mInterceptors,DiskCache.Factory diskFactory
-            ,IConvert convert,int cacheStagry){
+            ,IConvert convert,CacheStragry cacheStagry){
         this.mInterceptors = mInterceptors;
         this.mDiskFactory = diskFactory;
         mInterceptors.add(new MemoryInterceptor(cacheStagry));

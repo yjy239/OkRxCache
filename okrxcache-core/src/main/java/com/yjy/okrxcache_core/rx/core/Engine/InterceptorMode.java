@@ -5,13 +5,12 @@ package com.yjy.okrxcache_core.rx.core.Engine;
  *     author : yjy
  *     e-mail : yujunyu12@gmail.com
  *     time   : 2018/04/27
- *     desc   :
+ *     desc   :拦截器运行策略
  *     version: 1.0
  * </pre>
  */
 
 public class InterceptorMode {
-    //缓存策略
     public static final int RUN = 0;
     public static final int GET = 1;
     public static final int SAVE = 2;

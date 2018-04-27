@@ -75,5 +75,5 @@ public interface DiskCache {
     /**
      * Clear the cache.
      */
-    void clear();
+    void clear() throws IOException;
 }

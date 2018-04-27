@@ -103,10 +103,17 @@ public class RxCacheProcessor extends AbstractProcessor{
 
         for(Element e : roundEnvironment.getElementsAnnotatedWith(AutoCache.class)){
 
-            System.out.println("location : "+e.getEnclosingElement()+"."+e.getSimpleName());
-//            List<RxCacheMethod> methods = getMethodSymbol(e);
 
-            createResponseFounction(e);
+//            List<RxCacheMethod> methods = getMethodSymbol(e);
+            if(e.getKind() == ElementKind.INTERFACE){
+                System.out.println("location : "+e.getEnclosingElement()+"."
+                        +e.getSimpleName()+"\n"+e.getKind());
+                createResponseFounction(e);
+            }else {
+                System.out.println("Attention!!! @AutoCache only use on Interface");
+            }
+
+
         }
         return false;
     }
@@ -141,10 +148,10 @@ public class RxCacheProcessor extends AbstractProcessor{
                 //模仿lombok的文件体分析
                 if(jcTree instanceof JCTree.JCMethodDecl){
                     JCTree.JCMethodDecl method = (JCTree.JCMethodDecl) jcTree;
-                    System.out.println(method);
-                    System.out.println(method.restype);
+//                    System.out.println(method);
+//                    System.out.println(method.restype);
                     JCTree.JCExpression observerExp = make.Select(make.Ident(names.fromString("rx")),names.fromString("Observable"));
-                    System.out.println(" id "+observerExp);
+//                    System.out.println(" id "+observerExp);
                     //retrofit2.Response
                     JCTree.JCExpression ResponseExp = make.Select(make.Ident(names.fromString("retrofit2")),names.fromString("Response"));
                     //okhttp3.ResponseBody

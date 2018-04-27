@@ -46,10 +46,10 @@ public class DiskInterceptor<T> implements Interceptor {
     private final String TAG = "DiskCache";
     private DiskCache diskCache;
     private IConvert mConvert;
-    private int mCacheStagry = 0;
+    private CacheStragry mCacheStagry;
     private int mMode = 0;
 
-    public DiskInterceptor(DiskCache diskCache,IConvert convert,int cacheStagry){
+    public DiskInterceptor(DiskCache diskCache,IConvert convert,CacheStragry cacheStagry){
         this.diskCache = diskCache;
         this.mConvert = convert;
         this.mCacheStagry = cacheStagry;
@@ -68,10 +68,10 @@ public class DiskInterceptor<T> implements Interceptor {
             return loadDiskObservable;
         }else if(mMode == InterceptorMode.SAVE){
             return request.getObservable().compose(saveResultIsSuccess(request));
-        }else if(mMode == InterceptorMode.CLEAR){
-
         }else if(mMode == InterceptorMode.REMOVE){
-
+            return request.getObservable().compose(deleteResultIsSuccess(request));
+        }else if(mMode == InterceptorMode.CLEAR){
+            return request.getObservable().compose(clearCacheIsSuccess(request));
         }
 
         if(mCacheStagry == CacheStragry.ALL){
@@ -151,6 +151,12 @@ public class DiskInterceptor<T> implements Interceptor {
         };
     }
 
+    /**
+     * 保存成功之后的转化器
+     * @param request
+     * @param <T>
+     * @return
+     */
     private <T>Observable.Transformer<T,Boolean> saveResultIsSuccess(final Request request){
         return new Observable.Transformer<T, Boolean>() {
             @Override
@@ -166,6 +172,45 @@ public class DiskInterceptor<T> implements Interceptor {
             }
         };
     }
+
+    /**
+     * 删除成功的转化器
+     * @param request
+     * @param <T>
+     * @return
+     */
+    private <T>Observable.Transformer<T,Boolean> deleteResultIsSuccess(final Request request){
+        return new Observable.Transformer<T, Boolean>() {
+            @Override
+            public Observable<Boolean> call(Observable<T> tObservable) {
+
+                return tObservable.map(new Func1<T, Boolean>() {
+                    @Override
+                    public Boolean call(T t) {
+                        Log.e("transformeToCacheResult","toResult");
+                        return deleteFromDisk(request.getKey());
+                    }
+                });
+            }
+        };
+    }
+
+    private <T>Observable.Transformer<T,Boolean> clearCacheIsSuccess(final Request request){
+        return new Observable.Transformer<T, Boolean>() {
+            @Override
+            public Observable<Boolean> call(Observable<T> tObservable) {
+
+                return tObservable.map(new Func1<T, Boolean>() {
+                    @Override
+                    public Boolean call(T t) {
+                        Log.e("transformeToCacheResult","toResult");
+                        return clearFromDisk();
+                    }
+                });
+            }
+        };
+    }
+
 
     /**
      * 保存result
@@ -224,7 +269,12 @@ public class DiskInterceptor<T> implements Interceptor {
         return result;
     }
 
-    public boolean deleteFromDisk(Key key){
+    /**
+     * 删除disk文件中的动作
+     * @param key
+     * @return
+     */
+    private boolean deleteFromDisk(Key key){
         File cacheFile = diskCache.get(key);
         if (cacheFile == null) {
             return false;
@@ -235,6 +285,23 @@ public class DiskInterceptor<T> implements Interceptor {
             if (Log.isLoggable(TAG, Log.WARN)) {
                 Log.w(TAG, "Unable to delete from disk cache", e);
             }
+            return false;
+        }
+
+        return true;
+    }
+
+
+    /**
+     * 清空缓存
+     * @return
+     */
+    private boolean clearFromDisk(){
+        try {
+            diskCache.clear();
+        }catch (IOException e){
+
+            e.printStackTrace();
             return false;
         }
 

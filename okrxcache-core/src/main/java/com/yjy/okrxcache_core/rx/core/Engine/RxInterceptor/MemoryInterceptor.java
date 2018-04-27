@@ -3,6 +3,7 @@ package com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor;
 
 import android.util.Log;
 
+import com.yjy.okrxcache_core.rx.core.Cache.CacheStragry;
 import com.yjy.okrxcache_core.rx.core.CacheResult;
 import com.yjy.okrxcache_core.rx.core.Engine.InterceptorMode;
 
@@ -21,10 +22,10 @@ import rx.functions.Func1;
 
 public class MemoryInterceptor<T> implements Interceptor {
 
-    private int mCacheStagry = 0;
+    private CacheStragry mCacheStagry;
     private int mMode = 0;
 
-    public MemoryInterceptor(int cacheStagry){
+    public MemoryInterceptor(CacheStragry cacheStagry){
         this.mCacheStagry = cacheStagry;
     }
 
@@ -34,17 +35,20 @@ public class MemoryInterceptor<T> implements Interceptor {
         chain.request();
 
 
-        if(mMode == InterceptorMode.SAVE){
-            return chain.process();
-        }else if(mMode == InterceptorMode.GET){
-            return chain.process();
+//        if(mMode == InterceptorMode.SAVE){
+//            return chain.process();
+//        }else if(mMode == InterceptorMode.GET){
+//            return chain.process();
+//        }
+
+        if(mMode == InterceptorMode.RUN){
+            return getRealData(chain.process());
         }
 
 
 
 
-
-        return getRealData(chain.process());
+        return chain.process();
     }
 
     @Override

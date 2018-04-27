@@ -55,6 +55,10 @@ class ProcessHandler<T> implements InvocationHandler {
             Class<?>[] types = method.getParameterTypes();
 
             Method proxyMethod = mUsingClass.getClass().getMethod(method.getName()+"$$proxy",types);
+            if(proxyMethod == null){
+                Log.e("OkRxCache","create interface failed,we couldn,t use okrxcache,please check your interface");
+                return method.invoke(mUsingClass,objects);
+            }
 
             Observable observable = (Observable) proxyMethod.invoke(mUsingClass,objects);
 
