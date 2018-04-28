@@ -1,5 +1,9 @@
 package com.yjy.okrxcache_core.rx.core;
 
+import com.yjy.okrxcache_core.rx.core.Utils.Utils;
+
+import java.io.Serializable;
+
 /**
  * <pre>
  *     author : yjy
@@ -10,18 +14,27 @@ package com.yjy.okrxcache_core.rx.core;
  * </pre>
  */
 
-public class CacheResult<T> {
+public class CacheResult<T> implements Serializable{
     private final T mData;
 //    private final CacheStrategy mSource;
     private long mCurrentTime;
     private long mLifeTime;
+    private int mDataSize = 0;
 
     public CacheResult(T data,long currentTime,long lifeTime) {
         this.mData = data;
 
         this.mCurrentTime = currentTime;
         this.mLifeTime = lifeTime;
+//        mDataSize = Utils.getDataSize(mData);
 
+    }
+
+    public int getSize(){
+        if(mData == null){
+            return 0;
+        }
+        return mDataSize;
     }
 
     public T getData() {
@@ -32,11 +45,11 @@ public class CacheResult<T> {
 //        return mSource;
 //    }
 
-    public long getmCurrentTime() {
+    public long getCurrentTime() {
         return mCurrentTime;
     }
 
-    public long getmLifeTime() {
+    public long getLifeTime() {
         return mLifeTime;
     }
 

@@ -30,14 +30,14 @@ import rx.Observable;
 @AutoCache
 public interface ApiService {
 
-    @LifeCache(duaration = 2,unit = TimeUnit.MINUTES,setFromNet = false)
+    @LifeCache(duaration = 30,unit = TimeUnit.SECONDS,setFromNet = false)
     @GET("api/zhuzher/projects/buildings/{building_code}/houses")
     Observable<Integer> getHouseListByBuilding(@Path("building_code") String projectCode);
 
     String URL_BASE = "https://api.github.com";
     String HEADER_API_VERSION = "Accept: application/vnd.github.v3+json";
 
-    @LifeCache(duaration = 2,unit = TimeUnit.MINUTES)
+    @LifeCache(duaration = 5,unit = TimeUnit.SECONDS)
     @Headers({HEADER_API_VERSION})
     @GET("/users")
     Observable<List<User>> getUsers(@Query("since") int lastIdQueried, @Query("per_page") int perPage);

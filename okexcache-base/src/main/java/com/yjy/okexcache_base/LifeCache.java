@@ -20,9 +20,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(METHOD)
 @Retention(RUNTIME)
 public @interface LifeCache {
-    long duaration();
+    long duaration() default 0;
 
-    TimeUnit unit();
+    TimeUnit unit() default TimeUnit.SECONDS;
 
     boolean setFromNet() default false;
 }

@@ -39,7 +39,7 @@ public class NetWorkInterceptor<T> implements Interceptor {
             @Override
             public T call(Response<ResponseBody> responseBodyResponse)  {
                 //可能需要处理无法用gosn转化的对象
-                Log.e("header",responseBodyResponse.headers()+"");
+//                Log.e("header",responseBodyResponse.headers()+"");
                 Gson gson = new Gson();
                 JsonReader jsonReader = gson.newJsonReader(responseBodyResponse.body().charStream());
                 TypeAdapter adapter = gson.getAdapter(TypeToken.get(Utils.getReturnType(chain.request()

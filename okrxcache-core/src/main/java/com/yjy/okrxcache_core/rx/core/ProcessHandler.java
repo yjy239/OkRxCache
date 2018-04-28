@@ -3,6 +3,8 @@ package com.yjy.okrxcache_core.rx.core;
 import android.util.Log;
 
 import com.yjy.okexcache_base.LifeCache;
+import com.yjy.okrxcache_core.rx.core.Cache.Key.RequestKey;
+import com.yjy.okrxcache_core.rx.core.Request.Request;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
@@ -62,7 +64,10 @@ class ProcessHandler<T> implements InvocationHandler {
 
             Observable observable = (Observable) proxyMethod.invoke(mUsingClass,objects);
 
+
+
             return mCore.start(observable,cacheMethod);
+
         }
         Log.e("ProcessHandler0","method "+method.getName()+" objects"+objects[0]);
         return method.invoke(mUsingClass,objects);

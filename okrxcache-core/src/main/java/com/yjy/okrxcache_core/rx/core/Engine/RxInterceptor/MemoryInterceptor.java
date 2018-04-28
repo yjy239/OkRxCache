@@ -4,6 +4,7 @@ package com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor;
 import android.util.Log;
 
 import com.yjy.okrxcache_core.rx.core.Cache.CacheStragry;
+import com.yjy.okrxcache_core.rx.core.CacheCore;
 import com.yjy.okrxcache_core.rx.core.CacheResult;
 import com.yjy.okrxcache_core.rx.core.Engine.InterceptorMode;
 
@@ -24,9 +25,11 @@ public class MemoryInterceptor<T> implements Interceptor {
 
     private CacheStragry mCacheStagry;
     private int mMode = 0;
+    private CacheCore mCacheCore;
 
-    public MemoryInterceptor(CacheStragry cacheStagry){
+    public MemoryInterceptor(CacheCore core,CacheStragry cacheStagry){
         this.mCacheStagry = cacheStagry;
+        this.mCacheCore = core;
     }
 
     @Override
@@ -44,8 +47,6 @@ public class MemoryInterceptor<T> implements Interceptor {
         if(mMode == InterceptorMode.RUN){
             return getRealData(chain.process());
         }
-
-
 
 
         return chain.process();

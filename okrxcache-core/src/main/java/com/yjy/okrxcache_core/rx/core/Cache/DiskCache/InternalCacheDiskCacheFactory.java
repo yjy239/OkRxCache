@@ -1,4 +1,4 @@
-package com.yjy.okrxcache_core.rx.core.Cache.DisCache;
+package com.yjy.okrxcache_core.rx.core.Cache.DiskCache;
 
 /**
  * Created by software1 on 2018/1/31.
@@ -46,7 +46,7 @@ public final class InternalCacheDiskCacheFactory extends DiskLruCacheFactory {
                     }
                 }
                 if (cacheDirectory == null) {
-                    return null;
+                    throw new IllegalArgumentException("you create a illegal dir");
                 }
 
                 return cacheDirectory;

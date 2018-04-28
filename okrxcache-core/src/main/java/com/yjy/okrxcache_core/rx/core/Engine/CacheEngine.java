@@ -1,9 +1,15 @@
 package com.yjy.okrxcache_core.rx.core.Engine;
 
-import com.yjy.okrxcache_core.rx.core.Cache.DisCache.DiskCache;
-import com.yjy.okrxcache_core.rx.core.Cache.Key.Key;
+import com.yjy.okrxcache_core.rx.core.Cache.CacheStragry;
+import com.yjy.okrxcache_core.rx.core.Cache.DiskCache.DiskCache;
+import com.yjy.okrxcache_core.rx.core.CacheCore;
+import com.yjy.okrxcache_core.rx.core.Convert.IConvert;
+import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.DiskInterceptor;
 import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.Interceptor;
+import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.MemoryInterceptor;
+import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.NetWorkInterceptor;
 import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.RealInterceptorChain;
+import com.yjy.okrxcache_core.rx.core.Request.Request;
 
 import java.util.ArrayList;
 
@@ -16,6 +22,7 @@ import rx.Observable;
  *     time   : 2018/04/25
  *     desc   :the engine of Cache
  *     version: 1.0
+ *     目的是为了缓存的map挂载到CacheCore
  * </pre>
  */
 
@@ -24,8 +31,12 @@ public class CacheEngine<T> {
     private ArrayList<Interceptor> mInterceptors = new ArrayList<>();
 
 
-    public CacheEngine(ArrayList<Interceptor> mInterceptors,DiskCache.Factory diskFactory){
+    public CacheEngine(CacheCore core, ArrayList<Interceptor> mInterceptors, DiskCache diskCache
+            , IConvert convert, CacheStragry cacheStagry){
         this.mInterceptors = mInterceptors;
+        mInterceptors.add(new MemoryInterceptor(core,cacheStagry));
+        mInterceptors.add(new DiskInterceptor(diskCache,convert,cacheStagry));
+        mInterceptors.add(new NetWorkInterceptor());
     }
 
     /**

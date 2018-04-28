@@ -1,4 +1,4 @@
-package com.yjy.okrxcache_core.rx.core.Cache.DisCache;
+package com.yjy.okrxcache_core.rx.core.Cache.DiskCache;
 
 /**
  * Created by yjy on 2018/1/31.

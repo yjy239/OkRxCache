@@ -4,16 +4,14 @@ package com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
 import com.yjy.okrxcache_core.rx.core.Cache.ByteArrayPool;
 import com.yjy.okrxcache_core.rx.core.Cache.CacheStragry;
-import com.yjy.okrxcache_core.rx.core.Cache.DisCache.DiskCache;
+import com.yjy.okrxcache_core.rx.core.Cache.DiskCache.DiskCache;
 import com.yjy.okrxcache_core.rx.core.Cache.Key.Key;
 import com.yjy.okrxcache_core.rx.core.CacheResult;
 import com.yjy.okrxcache_core.rx.core.Convert.IConvert;
 import com.yjy.okrxcache_core.rx.core.Engine.InterceptorMode;
-import com.yjy.okrxcache_core.rx.core.Engine.Request;
+import com.yjy.okrxcache_core.rx.core.Request.Request;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -24,8 +22,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -43,11 +39,12 @@ import rx.functions.Func1;
 
 public class DiskInterceptor<T> implements Interceptor {
 
-    private final String TAG = "DiskCache";
     private DiskCache diskCache;
     private IConvert mConvert;
     private CacheStragry mCacheStagry;
     private int mMode = 0;
+
+    private static final String TAG = "DiskInterceptor";
 
     public DiskInterceptor(DiskCache diskCache,IConvert convert,CacheStragry cacheStagry){
         this.diskCache = diskCache;
@@ -57,7 +54,7 @@ public class DiskInterceptor<T> implements Interceptor {
 
     @Override
     public Observable intercept(Interceptor.Chain chain) {
-        Log.e("DiskInterceptor","DiskInterceptor");
+//        Log.e("DiskInterceptor","DiskInterceptor");
         final Request request = chain.request();
 
         //获取disk中的数据
@@ -118,10 +115,16 @@ public class DiskInterceptor<T> implements Interceptor {
             @Override
             public void call(Subscriber<? super Object> subscriber) {
                 CacheResult result = loadFromDisk(request.getKey());
-                if(result != null&&result.getData() != null){
+//                if(result != null&&result.getData() != null){
                     Log.e("MemoryInterceptor","DISK");
-                    subscriber.onNext(result);
-                }
+                    if(result == null){
+//                        CacheResult cacheResult = new CacheResult(null,System.currentTimeMillis(),0);
+//                        subscriber.onNext(cacheResult);
+                    }else {
+                        subscriber.onNext(result);
+                    }
+
+//                }
             }
         });
     }
@@ -252,6 +255,15 @@ public class DiskInterceptor<T> implements Interceptor {
         CacheResult<?> result = null;
         try {
             result = decodeFile2CacheResult(cacheFile);
+            //关闭强制获取过期数据
+            if(result != null&&!mCacheStagry.isOutDate()){
+                Log.e(TAG,"result time :"+(result.getLifeTime()+result.getCurrentTime())+" current :"+System.currentTimeMillis());
+                if(result.getLifeTime()+result.getCurrentTime() < System.currentTimeMillis()) {
+                    Log.e(TAG,"result is outdate"+result.toString());
+                    result = null;
+                }
+            }
+
         }catch (Exception e){
             e.printStackTrace();
         }finally {

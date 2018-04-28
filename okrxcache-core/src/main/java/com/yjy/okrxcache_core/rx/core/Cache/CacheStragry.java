@@ -12,15 +12,12 @@ package com.yjy.okrxcache_core.rx.core.Cache;
 
 public enum  CacheStragry {
     //缓存策略
-//    public static final int ALL = 0;
-//    public static final int ONLYDISK = 1;
-//    public static final int ONLYMEMORY = 2;
-//    public static final int ONLYNETWORK = 3;
-//    public static final int FIRSTCACHE = 4;
+    //优先缓存显示,之后会显示网络
     ALL(true),
     ONLYDISK(true),
     ONLYMEMORY(true),
     ONLYNETWORK(true),
+    //优先显示缓存，找到了就不找网络
     FIRSTCACHE(true);
 
 
@@ -30,7 +27,7 @@ public enum  CacheStragry {
         this.getOutdata = getOutdata;
     }
 
-    public boolean isOutData(){
+    public boolean isOutDate(){
         return getOutdata;
     }
 

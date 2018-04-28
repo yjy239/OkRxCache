@@ -1,5 +1,8 @@
 package com.yjy.okrxcache_core.rx.core.Utils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
@@ -23,6 +26,38 @@ import static com.google.gson.internal.$Gson$Types.getRawType;
  */
 
 public class Utils {
+
+
+
+    public static int getDataSize(Object obj){
+        if(obj == null){
+            return 0;
+        }
+        byte[] bytes=new byte[2048];
+        ByteArrayOutputStream bo = null;
+        ObjectOutputStream oo = null;
+        try {
+            // object to bytearray
+            bo = new ByteArrayOutputStream();
+            oo = new ObjectOutputStream(bo);
+            oo.writeObject(obj);
+            bytes = bo.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            close(bo);
+            close(oo);
+        }
+        return bytes.length;
+    }
+
+    public static void close(OutputStream stream){
+        try {
+            stream.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     //模仿rxjava获取returntype
     public static Type getReturnType(Type returnType){

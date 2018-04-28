@@ -1,14 +1,11 @@
 package com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor;
 
-import com.yjy.okrxcache_core.rx.core.CacheResult;
-import com.yjy.okrxcache_core.rx.core.Engine.Request;
+import com.yjy.okrxcache_core.rx.core.Request.Request;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
-import rx.Subscriber;
-import rx.schedulers.Schedulers;
 
 /**
  * <pre>

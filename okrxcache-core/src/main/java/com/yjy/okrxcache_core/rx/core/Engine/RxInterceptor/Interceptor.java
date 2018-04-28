@@ -1,11 +1,9 @@
 package com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor;
 
-import com.yjy.okrxcache_core.rx.core.CacheResult;
-import com.yjy.okrxcache_core.rx.core.Engine.Request;
+import com.yjy.okrxcache_core.rx.core.Request.Request;
 
 
 import rx.Observable;
-import rx.Subscriber;
 
 /**
  * <pre>
