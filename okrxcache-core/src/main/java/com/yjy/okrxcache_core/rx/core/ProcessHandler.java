@@ -27,11 +27,13 @@ class ProcessHandler<T> implements InvocationHandler {
     private Object mUsingClass;
     private CacheCore mCore;
     private HashMap<Method,CacheMethod> mCacheMethodMap = new HashMap<>();
+    private Request mRequest;
 
 
-    public ProcessHandler(Object usingClass,CacheCore core){
+    public ProcessHandler(Object usingClass,CacheCore core,Request request){
         this.mUsingClass = usingClass;
         this.mCore = core;
+        this.mRequest = request;
     }
 
     @Override
@@ -66,7 +68,7 @@ class ProcessHandler<T> implements InvocationHandler {
 
 
 
-            return mCore.start(observable,cacheMethod);
+            return mCore.start(observable,cacheMethod,mRequest);
 
         }
         Log.e("ProcessHandler0","method "+method.getName()+" objects"+objects[0]);

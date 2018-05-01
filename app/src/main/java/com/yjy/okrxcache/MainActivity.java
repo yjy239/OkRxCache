@@ -32,53 +32,8 @@ public class MainActivity extends AppCompatActivity {
         Button btn = (Button)findViewById(R.id.request);
 
 
+//
 
-//        OkRxCache cache = new OkRxCache.Builder()
-//                .with(this)
-//                .setStragry(CacheStragry.ALL)
-//                .using(ApiService.class)
-//                .force(false)
-//                .build();
-//
-//        cache.put("222",new User(2,"2","1111111"),111)
-//                .subscribeOn(Schedulers.io())
-//                .subscribeOn(Schedulers.io())
-//                .subscribe(new Subscriber<Boolean>() {
-//                    @Override
-//                    public void onCompleted() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onNext(Boolean aBoolean) {
-//                        Log.e("aaa",aBoolean.toString());
-//                    }
-//                });
-//
-//        cache.get("1111")
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(Schedulers.io())
-//                .subscribe(new Subscriber<CacheResult>() {
-//                    @Override
-//                    public void onCompleted() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onNext(CacheResult cacheResult) {
-//                        Log.e("result",cacheResult.getData().toString());
-//                    }
-//                });
 //
 //
 //
@@ -96,82 +51,106 @@ public class MainActivity extends AppCompatActivity {
 //
 //
 //
-//        Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(ApiService.URL_BASE)
-//                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .build();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(ApiService.URL_BASE)
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 //
-//        ApiService restApi = retrofit.create(ApiService.class);
+        ApiService restApi = retrofit.create(ApiService.class);
+
+        final ApiService proxy = OkRxCache.with(this)
+                .using(ApiService.class)
+                .create(restApi);
+
+
+        OkRxCache.with(this).put("222",new User(2,"2","1111111"),111)
+                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Subscriber<Boolean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Boolean aBoolean) {
+                        Log.e("aaa",aBoolean.toString());
+                    }
+                });
+
+        OkRxCache.with(this).get("222")
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Subscriber<CacheResult>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(CacheResult cacheResult) {
+                        Log.e("result",cacheResult.getData().toString());
+                    }
+                });
+
 //
-//        final ApiService proxy = cache.create(restApi);
-//
-////        proxy.getUser(1,1)
-////                .subscribeOn(Schedulers.io())
-////                .observeOn(Schedulers.io())
-////                .subscribe(new Subscriber<Response<ResponseBody>>() {
-////                    @Override
-////                    public void onCompleted() {
-////
-////                    }
-////
-////                    @Override
-////                    public void onError(Throwable e) {
-////                        Log.e("error",e.toString());
-////                    }
-////
-////                    @Override
-////                    public void onNext(Response<ResponseBody> users) {
-////                        Log.e("num","header : "+users.headers());
-////                    }
-////                });
 //
 //
-//
-//        btn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                proxy.getUsers(2,1)
-//                        .subscribeOn(Schedulers.io())
-//                        .observeOn(Schedulers.io())
-//                        .subscribe(new Subscriber<List<User>>() {
-//                            @Override
-//                            public void onCompleted() {
-//
-//                            }
-//
-//                            @Override
-//                            public void onError(Throwable e) {
-//
-//                            }
-//
-//                            @Override
-//                            public void onNext(List<User> users) {
-//                                Log.e("User",users.toString());
-//                            }
-//                        });
-//
-//                proxy.getUsers(2,1)
-//                        .subscribeOn(Schedulers.io())
-//                        .observeOn(Schedulers.io())
-//                        .subscribe(new Subscriber<List<User>>() {
-//                            @Override
-//                            public void onCompleted() {
-//
-//                            }
-//
-//                            @Override
-//                            public void onError(Throwable e) {
-//
-//                            }
-//
-//                            @Override
-//                            public void onNext(List<User> users) {
-//                                Log.e("User",users.toString());
-//                            }
-//                        });
-//            }
-//        });
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                proxy.getUsers(2,1)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io())
+                        .subscribe(new Subscriber<List<User>>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onNext(List<User> users) {
+                                Log.e("User",users.toString());
+                            }
+                        });
+
+                proxy.getUsers(2,1)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io())
+                        .subscribe(new Subscriber<List<User>>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onNext(List<User> users) {
+                                Log.e("User",users.toString());
+                            }
+                        });
+            }
+        });
 //
 //        proxy.getUsers(2,1)
 //                .subscribeOn(Schedulers.io())

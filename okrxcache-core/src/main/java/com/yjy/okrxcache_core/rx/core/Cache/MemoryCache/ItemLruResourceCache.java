@@ -13,15 +13,15 @@ import com.yjy.okrxcache_core.rx.core.CacheResult;
 /**
  * An LRU in memory cache for {@link }s.
  */
-public class LruResourceCache extends LruCache<Key, CacheResult<?>> implements MemoryCache {
+public class ItemLruResourceCache extends ItemLruCache<Key, CacheResult<?>> implements MemoryCache {
     private ResourceRemovedListener listener;
 
     /**
-     * Constructor for LruResourceCache.
+     * Constructor for ItemLruResourceCache.
      *
      * @param size The maximum size in bytes the in memory cache can use.
      */
-    public LruResourceCache(int size) {
+    public ItemLruResourceCache(int size) {
         super(size);
     }
 

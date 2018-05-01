@@ -115,22 +115,19 @@ public class DiskInterceptor<T> implements Interceptor {
             @Override
             public void call(Subscriber<? super Object> subscriber) {
                 CacheResult result = loadFromDisk(request.getKey());
-//                if(result != null&&result.getData() != null){
-                    Log.e("MemoryInterceptor","DISK");
+                    Log.e("DiskInterceptor","DISK");
                     if(result == null){
-//                        CacheResult cacheResult = new CacheResult(null,System.currentTimeMillis(),0);
-//                        subscriber.onNext(cacheResult);
                     }else {
                         subscriber.onNext(result);
                     }
+                    subscriber.onCompleted();
 
-//                }
             }
         });
     }
 
     /**
-     * 网络拦截器返回之后，转化为擦车result，并且保存
+     * 网络拦截器返回之后，转化为cacheresult，并且保存
      * @param request
      * @param <T>
      * @return
@@ -143,7 +140,7 @@ public class DiskInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, CacheResult<T>>() {
                     @Override
                     public CacheResult<T> call(T t) {
-                        Log.e("transformeToCacheResult","toResult");
+                        Log.e("DiskInterceptor","toResult");
                         CacheResult result = new CacheResult(t,System.currentTimeMillis(),
                                 request.getMethod().getLifeTime());
                         save2DiskCache(request.getKey(),result);
@@ -168,7 +165,8 @@ public class DiskInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, Boolean>() {
                     @Override
                     public Boolean call(T t) {
-                        Log.e("transformeToCacheResult","toResult");
+                        Log.e("DiskInterceptor","toResult");
+                        request.setResult((CacheResult) t);
                         return save2DiskCache(request.getKey(),(CacheResult) t);
                     }
                 });
@@ -190,7 +188,7 @@ public class DiskInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, Boolean>() {
                     @Override
                     public Boolean call(T t) {
-                        Log.e("transformeToCacheResult","toResult");
+                        Log.e("DiskInterceptor","toResult");
                         return deleteFromDisk(request.getKey());
                     }
                 });
@@ -206,7 +204,7 @@ public class DiskInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, Boolean>() {
                     @Override
                     public Boolean call(T t) {
-                        Log.e("transformeToCacheResult","toResult");
+                        Log.e("DiskInterceptor","toResult");
                         return clearFromDisk();
                     }
                 });

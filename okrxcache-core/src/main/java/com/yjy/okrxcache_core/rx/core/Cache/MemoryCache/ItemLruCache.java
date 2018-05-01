@@ -14,18 +14,18 @@ import java.util.Map;
  * </pre>
  */
 
-public class LruCache<T, Y> {
+public class ItemLruCache<T, Y> {
     private final LinkedHashMap<T, Y> cache = new LinkedHashMap<T, Y>(100, 0.75f, true);
     private int maxSize;
     private final int initialMaxSize;
     private int currentSize = 0;
 
     /**
-     * Constructor for LruCache.
+     * Constructor for ItemLruCache.
      *
      * @param size The maximum size of the cache, the units must match the units used in {@link #getSize(Object)}.
      */
-    public LruCache(int size) {
+    public ItemLruCache(int size) {
         this.initialMaxSize = size;
         this.maxSize = size;
     }
@@ -118,13 +118,7 @@ public class LruCache<T, Y> {
         }
 
         final Y result = cache.put(key, item);
-//        if (item != null) {
-//            currentSize += getSize(item);
-//        }
-//        if (result != null) {
-//            // TODO: should we call onItemEvicted here?
-//            currentSize -= getSize(result);
-//        }
+        currentSize ++;
         evict();
 
         return result;
@@ -137,9 +131,7 @@ public class LruCache<T, Y> {
      */
     public Y remove(T key) {
         final Y value = cache.remove(key);
-//        if (value != null) {
-//            currentSize -= getSize(value);
-//        }
+        currentSize--;
         return value;
     }
 

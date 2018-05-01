@@ -15,7 +15,7 @@ import java.io.File;
  */
 public class DiskLruCacheFactory implements DiskCache.Factory {
 
-    private final int diskCacheSize;
+    private int diskCacheSize;
     private final CacheDirectoryGetter cacheDirectoryGetter;
 
     /**
@@ -69,5 +69,12 @@ public class DiskLruCacheFactory implements DiskCache.Factory {
 
         return DiskLruCacheWrapper.get(cacheDir, diskCacheSize);
     }
+
+    @Override
+    public DiskCache.Factory setSize(int size) {
+        this.diskCacheSize = size == 0?DiskCache.Factory.DEFAULT_DISK_CACHE_SIZE:size;
+        return this;
+    }
+
 }
 

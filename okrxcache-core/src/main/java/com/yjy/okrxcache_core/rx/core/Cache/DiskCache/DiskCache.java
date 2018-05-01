@@ -28,6 +28,9 @@ public interface DiskCache {
          * Returns a new disk cache, or {@code null} if no disk cache could be created.
          */
         DiskCache build();
+
+        Factory setSize(int size);
+
     }
 
     /**

@@ -14,7 +14,7 @@ public class LruCache<T, Y> {
     private int currentSize = 0;
 
     /**
-     * Constructor for LruCache.
+     * Constructor for ItemLruCache.
      *
      * @param size The maximum size of the cache, the units must match the units used in {@link #getSize(Object)}.
      */
