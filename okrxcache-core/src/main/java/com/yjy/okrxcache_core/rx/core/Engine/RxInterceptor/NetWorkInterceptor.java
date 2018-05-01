@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import com.yjy.okrxcache_core.rx.core.CacheResult;
 import com.yjy.okrxcache_core.rx.core.Utils.Utils;
 
 import okhttp3.ResponseBody;
@@ -57,7 +58,7 @@ public class NetWorkInterceptor<T> implements Interceptor {
         }).onErrorReturn(new Func1() {
             @Override
             public Object call(Object o) {
-                return "error";
+                return new CacheResult<>(null,0,0);
             }
         });
     }

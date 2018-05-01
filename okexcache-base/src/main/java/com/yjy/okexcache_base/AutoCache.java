@@ -4,6 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <pre>
@@ -17,5 +18,11 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.CLASS)
 public @interface AutoCache {
+    long duaration() default 0;
 
+    TimeUnit unit() default TimeUnit.SECONDS;
+
+    boolean setFromNet() default false;
+
+    boolean open() default false;
 }
