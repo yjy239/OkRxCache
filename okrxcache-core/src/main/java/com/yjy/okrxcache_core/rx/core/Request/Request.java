@@ -174,11 +174,11 @@ public class Request<T> {
         isNetTime = netTime;
     }
 
-    public long getmNetTime() {
+    public long getNetTime() {
         return mNetTime;
     }
 
-    public void setmNetTime(long mNetTime) {
+    public void setNetTime(long mNetTime) {
         this.mNetTime = mNetTime;
     }
 

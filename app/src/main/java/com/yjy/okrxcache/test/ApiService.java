@@ -7,8 +7,6 @@ import com.yjy.okexcache_base.AutoCache;
 import com.yjy.okexcache_base.LifeCache;
 import com.yjy.okrxcache.CommonDictResponse;
 import com.yjy.okrxcache.HttpResult;
-import com.yjy.okrxcache.Task;
-import com.yjy.okrxcache.User;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
