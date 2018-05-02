@@ -5,6 +5,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.yjy.okrxcache_core.rx.core.CacheResult;
+import com.yjy.okrxcache_core.rx.core.OkRxCache;
 import com.yjy.okrxcache_core.rx.core.Utils.Utils;
 
 import java.io.File;
@@ -42,8 +43,9 @@ public class GsonConvert implements IConvert{
         try {
             reader = new FileReader(cacheFile);
             JsonReader jsonReader = mGson.newJsonReader(reader);
-            Type token = Utils.getReturnType(method.getGenericReturnType());
-            TypeAdapter adapter = mGson.getAdapter(CacheResult.class);
+            final Type token = Utils.getReturnType(method.getGenericReturnType());
+            TypeToken objectType = TypeToken.getParameterized(CacheResult.class,token);
+            TypeAdapter adapter = mGson.getAdapter(objectType);
             result = (CacheResult) adapter.read(jsonReader);
         } catch (Exception e) {
             e.printStackTrace();
