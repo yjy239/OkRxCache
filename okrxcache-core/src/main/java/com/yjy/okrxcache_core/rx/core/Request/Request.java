@@ -50,6 +50,10 @@ public class Request<T> {
 
     private CacheEngine mEngine;
     private CacheResult result;
+    private boolean isNetTime = false;
+    private long mNetTime = 0;
+
+    private boolean isHadGetCache = false;
 
 
     public static <T>Request obtain(CacheEngine engine,List<Interceptor> interceptors, int  diskSize,
@@ -83,7 +87,8 @@ public class Request<T> {
     }
 
 
-    public void init2(Key key,T data,boolean interceptor,Observable observable,CacheMethod mMethod){
+    public void init2(Request request,Key key,T data,boolean interceptor,Observable observable,CacheMethod mMethod){
+        request.clear();
         this.key = key;
         this.data = data;
         this.interceptor = interceptor;
@@ -161,6 +166,30 @@ public class Request<T> {
         this.result = result;
     }
 
+    public boolean isNetTime() {
+        return isNetTime;
+    }
+
+    public void setNetTime(boolean netTime) {
+        isNetTime = netTime;
+    }
+
+    public long getmNetTime() {
+        return mNetTime;
+    }
+
+    public void setmNetTime(long mNetTime) {
+        this.mNetTime = mNetTime;
+    }
+
+    public boolean isHadGetCache() {
+        return isHadGetCache;
+    }
+
+    public void setHadGetCache(boolean hadGetCache) {
+        isHadGetCache = hadGetCache;
+    }
+
     public void clear(){
         if(mEngine != null){
             mEngine.release(this);
@@ -180,5 +209,8 @@ public class Request<T> {
         this.mCacheStagry = CacheStragry.ALL;
         isForce = true;
         this.result = null;
+        this.mNetTime = 0;
+        this.isNetTime = false;
+        this.isHadGetCache = false;
     }
 }

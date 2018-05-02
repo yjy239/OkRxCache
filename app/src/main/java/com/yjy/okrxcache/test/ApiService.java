@@ -5,6 +5,9 @@ package com.yjy.okrxcache.test;
 
 import com.yjy.okexcache_base.AutoCache;
 import com.yjy.okexcache_base.LifeCache;
+import com.yjy.okrxcache.CommonDictResponse;
+import com.yjy.okrxcache.HttpResult;
+import com.yjy.okrxcache.Task;
 import com.yjy.okrxcache.User;
 
 import java.util.List;
@@ -27,7 +30,7 @@ import rx.Observable;
  *     version: 1.0
  * </pre>
  */
-@AutoCache
+@AutoCache(duaration = 5,unit = TimeUnit.SECONDS,setFromNet = true,open = true)
 public interface ApiService {
 
     @LifeCache(duaration = 30,unit = TimeUnit.SECONDS,setFromNet = false)
@@ -37,7 +40,7 @@ public interface ApiService {
     String URL_BASE = "https://api.github.com";
     String HEADER_API_VERSION = "Accept: application/vnd.github.v3+json";
 
-    @LifeCache(duaration = 5,unit = TimeUnit.SECONDS)
+    @LifeCache(duaration = 5,unit = TimeUnit.SECONDS,setFromNet = true)
     @Headers({HEADER_API_VERSION})
     @GET("/users")
     Observable<List<User>> getUsers(@Query("since") int lastIdQueried, @Query("per_page") int perPage);
@@ -45,4 +48,8 @@ public interface ApiService {
     @Headers({HEADER_API_VERSION,"aaaaaa"})
     @GET("/users")
     Observable<Response<ResponseBody>> getUser(@Query("since") int lastIdQueried, @Query("per_page") int perPage);
+
+    @Headers("Authorization-Control: no")
+    @GET("https://flyingdutchman.4009515151.com/api/zhuzher/info")
+    Observable<HttpResult<CommonDictResponse.Result>> getCommonDict();
 }

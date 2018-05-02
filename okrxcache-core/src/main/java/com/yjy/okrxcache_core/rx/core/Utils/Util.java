@@ -72,7 +72,7 @@ public class Util {
     }
 
     /**
-     * Returns a {@link java.util.Queue} of the given size using Glide's preferred implementation.
+     * Returns a {@link java.util.Queue} of the given size using rxcache's preferred implementation.
      */
     public static <T> Queue<T> createQueue(int size) {
         return new ArrayDeque<T>(size);

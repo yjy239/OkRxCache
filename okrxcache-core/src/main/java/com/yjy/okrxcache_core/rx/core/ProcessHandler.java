@@ -2,6 +2,7 @@ package com.yjy.okrxcache_core.rx.core;
 
 import android.util.Log;
 
+import com.yjy.okexcache_base.AutoCache;
 import com.yjy.okexcache_base.LifeCache;
 import com.yjy.okrxcache_core.rx.core.Cache.Key.RequestKey;
 import com.yjy.okrxcache_core.rx.core.Request.Request;
@@ -28,24 +29,35 @@ class ProcessHandler<T> implements InvocationHandler {
     private CacheCore mCore;
     private HashMap<Method,CacheMethod> mCacheMethodMap = new HashMap<>();
     private Request mRequest;
+    private static final String TAG = "OkRxCache";
+    private AutoCache mAutoCache;
 
 
-    public ProcessHandler(Object usingClass,CacheCore core,Request request){
+    public ProcessHandler(Object usingClass,CacheCore core,Request request,AutoCache autoCache){
         this.mUsingClass = usingClass;
         this.mCore = core;
         this.mRequest = request;
+        this.mAutoCache = autoCache;
     }
 
     @Override
     public Object invoke(Object o, final Method method, Object[] objects) throws Throwable {
-        Log.e("ProcessHandler","method "+method.getName()+" objects"+objects[0]);
         //动态代理生成CacheMethod
         CacheMethod cacheMethod = null;
 
+
         //
         if(method.getReturnType() == Observable.class){
+
+            if(mAutoCache == null){
+                Log.e(TAG,"you lose a @AutoCahe on Interface,you couldn't not use OkRxCache");
+                return method.invoke(mUsingClass,objects);
+            }
+
             for(Annotation annotation : method.getDeclaredAnnotations()){
-                if(annotation instanceof LifeCache){
+                if(mAutoCache.open()){
+                    cacheMethod = loadCacheMethod(method,objects);
+                }else if(annotation instanceof LifeCache){
                     cacheMethod = loadCacheMethod(method,objects);
                     break;
                 }
@@ -60,13 +72,12 @@ class ProcessHandler<T> implements InvocationHandler {
 
             Method proxyMethod = mUsingClass.getClass().getMethod(method.getName()+"$$proxy",types);
             if(proxyMethod == null){
-                Log.e("OkRxCache","create interface failed,we couldn,t use okrxcache,please check your interface");
+                Log.e("OkRxCache","create interface failed,we couldn't use okrxcache,please check your interface");
                 return method.invoke(mUsingClass,objects);
             }
 
+
             Observable observable = (Observable) proxyMethod.invoke(mUsingClass,objects);
-
-
 
             return mCore.start(observable,cacheMethod,mRequest);
 
@@ -74,8 +85,6 @@ class ProcessHandler<T> implements InvocationHandler {
         Log.e("ProcessHandler0","method "+method.getName()+" objects"+objects[0]);
         return method.invoke(mUsingClass,objects);
     }
-
-
 
 
 
@@ -88,7 +97,7 @@ class ProcessHandler<T> implements InvocationHandler {
         synchronized (mCacheMethodMap){
             result = mCacheMethodMap.get(method);
             if (result == null) {
-                result = new CacheMethod.Builder(mCore, method,objs).build();
+                result = new CacheMethod.Builder(mAutoCache,method,objs).build();
                 mCacheMethodMap.put(method, result);
             }
         }

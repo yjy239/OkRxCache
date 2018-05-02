@@ -2,11 +2,15 @@ package com.yjy.okrxcache_core.rx.core.Convert;
 
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.yjy.okrxcache_core.rx.core.CacheResult;
+import com.yjy.okrxcache_core.rx.core.Utils.Utils;
 
 import java.io.File;
 import java.io.FileReader;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 /**
  * <pre>
@@ -32,12 +36,13 @@ public class GsonConvert implements IConvert{
     }
 
     @Override
-    public CacheResult setResult(File cacheFile) {
+    public CacheResult setResult(File cacheFile, Method method) {
         FileReader reader = null;
         CacheResult result = null;
         try {
             reader = new FileReader(cacheFile);
             JsonReader jsonReader = mGson.newJsonReader(reader);
+            Type token = Utils.getReturnType(method.getGenericReturnType());
             TypeAdapter adapter = mGson.getAdapter(CacheResult.class);
             result = (CacheResult) adapter.read(jsonReader);
         } catch (Exception e) {

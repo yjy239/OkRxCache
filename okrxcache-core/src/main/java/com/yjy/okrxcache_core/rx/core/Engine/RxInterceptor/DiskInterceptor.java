@@ -22,6 +22,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -62,6 +63,9 @@ public class DiskInterceptor<T> implements Interceptor {
 
         //判断拦截器执行模式
         if(mMode == InterceptorMode.GET){
+            if(request.isHadGetCache()){
+                return request.getObservable();
+            }
             return loadDiskObservable;
         }else if(mMode == InterceptorMode.SAVE){
             return request.getObservable().compose(saveResultIsSuccess(request));
@@ -73,6 +77,10 @@ public class DiskInterceptor<T> implements Interceptor {
 
         if(mCacheStagry == CacheStragry.ALL){
             //优先缓存显示,之后会显示网络
+            //一旦发现request告诉你已经拿到缓存了，没必要再从disk中获取
+            if(request.isHadGetCache()){
+                return transFormToCache(chain.process(),request);
+            }
             return Observable.merge(loadDiskObservable,transFormToCache(chain.process(),request));
         }else if(mCacheStagry == CacheStragry.FIRSTCACHE){
             //优先显示缓存，找到了就不找网络
@@ -114,8 +122,8 @@ public class DiskInterceptor<T> implements Interceptor {
         return Observable.create(new Observable.OnSubscribe<Object>() {
             @Override
             public void call(Subscriber<? super Object> subscriber) {
-                CacheResult result = loadFromDisk(request.getKey());
-                    Log.e("DiskInterceptor","DISK");
+                CacheResult result = loadFromDisk(request.getKey(),request.getMethod().getMethod());
+                    Log.e("DiskInterceptor","result"+result);
                     if(result == null){
                     }else {
                         subscriber.onNext(result);
@@ -143,6 +151,7 @@ public class DiskInterceptor<T> implements Interceptor {
                         Log.e("DiskInterceptor","toResult");
                         CacheResult result = new CacheResult(t,System.currentTimeMillis(),
                                 request.getMethod().getLifeTime());
+                        request.setResult(result);
                         save2DiskCache(request.getKey(),result);
                         return result;
                     }
@@ -245,14 +254,14 @@ public class DiskInterceptor<T> implements Interceptor {
      * @param key
      * @return
      */
-    private CacheResult loadFromDisk(Key key){
+    private CacheResult loadFromDisk(Key key,Method method){
         File cacheFile = diskCache.get(key);
         if (cacheFile == null) {
             return null;
         }
         CacheResult<?> result = null;
         try {
-            result = decodeFile2CacheResult(cacheFile);
+            result = decodeFile2CacheResult(cacheFile,method);
             //关闭强制获取过期数据
             if(result != null&&!mCacheStagry.isOutDate()){
                 Log.e(TAG,"result time :"+(result.getLifeTime()+result.getCurrentTime())+" current :"+System.currentTimeMillis());
@@ -323,7 +332,7 @@ public class DiskInterceptor<T> implements Interceptor {
      * @param cacheFile
      * @return
      */
-    private CacheResult decodeFile2CacheResult(File cacheFile){
+    private CacheResult decodeFile2CacheResult(File cacheFile,Method method){
         Gson gson = new Gson();
         FileReader reader = null;
         CacheResult result=null;
@@ -332,7 +341,7 @@ public class DiskInterceptor<T> implements Interceptor {
 //            JsonReader jsonReader = gson.newJsonReader(reader);
 //            TypeAdapter adapter = gson.getAdapter(CacheResult.class);
 //            result = (CacheResult) adapter.read(jsonReader);
-            result = mConvert.setResult(cacheFile);
+            result = mConvert.setResult(cacheFile,method);
         }catch (Exception e){
             e.printStackTrace();
         }finally {

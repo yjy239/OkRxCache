@@ -1,7 +1,9 @@
 package com.yjy.okrxcache_core.rx.core;
 
 import android.content.Context;
+import android.util.Log;
 
+import com.yjy.okexcache_base.AutoCache;
 import com.yjy.okrxcache_core.rx.core.Cache.CacheStragry;
 import com.yjy.okrxcache_core.rx.core.Cache.DiskCache.DiskCache;
 import com.yjy.okrxcache_core.rx.core.Convert.GsonConvert;
@@ -115,7 +117,7 @@ public class RequestBuilder {
         return this;
     }
 
-    private Request build(){
+    public Request build(){
         return Request.obtain(mOkRxCache.getEngine(),mInterceptors,
                 mDiskSize,mConvert,mCacheStagry,isForce);
     }
@@ -126,8 +128,12 @@ public class RequestBuilder {
         if(mUsingClass == null){
             throw new IllegalArgumentException("you miss a proxy class,please set the using()");
         }
+        AutoCache cache = mUsingClass.getAnnotation(AutoCache.class);
+
+        Log.e("autoCache","cache"+cache+" "+mUsingClass.getSimpleName());
+
         Request request = build();
-        ProcessHandler handler = new ProcessHandler(orgin,mCore,request);
+        ProcessHandler handler = new ProcessHandler(orgin,mCore,request,cache);
 
         return (T) Proxy.newProxyInstance(orgin.getClass().getClassLoader(),new Class<?>[]{mUsingClass},handler);
     }

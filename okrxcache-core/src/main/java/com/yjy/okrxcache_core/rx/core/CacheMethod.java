@@ -4,6 +4,7 @@ package com.yjy.okrxcache_core.rx.core;
 
 import android.util.Log;
 
+import com.yjy.okexcache_base.AutoCache;
 import com.yjy.okexcache_base.LifeCache;
 
 import java.lang.annotation.Annotation;
@@ -92,7 +93,6 @@ public class CacheMethod {
 
     public static class Builder{
         private long mLifeTime;
-        private CacheCore mCore;
         private Method mMethod;
         private boolean mFromNet;
         private String mRelativeUrl;
@@ -103,20 +103,28 @@ public class CacheMethod {
         private String mReturnType = "";
         private Object[] mParamterObjects;
         private String mObjectString="";
+        private AutoCache mAutoCache;
 
-        public Builder(CacheCore core,Method method,Object[] objects){
-            this.mCore = core;
+        public Builder(AutoCache cache,Method method,Object[] objects){
             this.mMethod = method;
             this.mParamterObjects = objects;
+            this.mAutoCache = cache;
         }
 
         public CacheMethod build(){
             LifeCache life = mMethod.getAnnotation(LifeCache.class);
-            long duaration = life.duaration();
-            TimeUnit unit = life.unit();
-            long time = unit.toSeconds(duaration);
-            mFromNet = life.setFromNet();
-            
+
+            if(life != null){
+                long duaration = life.duaration();
+                TimeUnit unit = life.unit();
+                mLifeTime = unit.toSeconds(duaration);
+                mFromNet = life.setFromNet();
+            }else if(mAutoCache != null&&mAutoCache.open()){
+                long duaration = mAutoCache.duaration();
+                mLifeTime = mAutoCache.unit().toSeconds(duaration);
+                mFromNet = mAutoCache.setFromNet();
+            }
+
             parseAnntioans(mMethod);
             return new CacheMethod(this);
         }

@@ -31,10 +31,7 @@ public class CacheResult<T> implements Serializable{
     }
 
     public int getSize(){
-        if(mData == null){
-            return 0;
-        }
-        return mDataSize;
+        return 1;
     }
 
     public T getData() {

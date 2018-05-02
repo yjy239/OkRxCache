@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
  * </pre>
  */
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.CLASS)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface AutoCache {
     long duaration() default 0;
 

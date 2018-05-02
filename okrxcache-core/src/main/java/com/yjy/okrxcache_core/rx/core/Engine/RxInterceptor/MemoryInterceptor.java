@@ -61,6 +61,7 @@ public class MemoryInterceptor<T> implements Interceptor {
         if(mMode == InterceptorMode.RUN){
             if(mCacheStagry == CacheStragry.ALL){
                 //优先缓存显示,之后会显示网络
+//                return getRealData(chain.process().compose(save2CacheResult(request)));
                 return Observable.merge(getRealData(memoryObservale),getRealData(chain.process().compose(save2CacheResult(request))));
             }else if(mCacheStagry == CacheStragry.FIRSTCACHE){
                 //优先显示缓存，找到了就不找网络
@@ -70,6 +71,8 @@ public class MemoryInterceptor<T> implements Interceptor {
                 return getRealData(chain.process().compose(save2CacheResult(request)));
             }else if(mCacheStagry == CacheStragry.ONLYMEMORY){
                 return getRealData(memoryObservale);
+            }else {
+                return getRealData(chain.process());
             }
         }
 
@@ -114,13 +117,20 @@ public class MemoryInterceptor<T> implements Interceptor {
                     //获取活跃的资源是否存在
                     result = mEngine.loadFromActiveResources(request.getKey(),true);
                 }
-                if(result != null&&!mCacheStagry.isOutDate()){
-                    if(result.getLifeTime()+result.getCurrentTime() < System.currentTimeMillis()) {
+                if(result != null){
+                    if(!mCacheStagry.isOutDate() &&result.getLifeTime()+result.getCurrentTime() < System.currentTimeMillis()) {
                         Log.e(TAG,"result is outdate"+result.toString());
                         result = null;
                     }
+
+                    if(result != null){
+                        request.setHadGetCache(true);
+                    }
+
+                    Log.e("MemoryInterceptor","result "+result);
                     subscriber.onNext(result);
                 }
+
                 subscriber.onCompleted();
 
 
@@ -168,6 +178,7 @@ public class MemoryInterceptor<T> implements Interceptor {
                     public CacheResult<T> call(T t) {
                         Log.e("MemoryInterceptor","save2CacheResult");
                         mEngine.complete(request.getKey(),(CacheResult)t);
+                        request.setResult((CacheResult)t);
                         return (CacheResult)t;
                     }
                 });
@@ -181,16 +192,16 @@ public class MemoryInterceptor<T> implements Interceptor {
      * @param <T>
      * @return
      */
-    private <T>Observable.Transformer<T,CacheResult> clearCacheIsSuccess(final Request request){
-        return new Observable.Transformer<T, CacheResult>() {
+    private <T>Observable.Transformer<T,Boolean> clearCacheIsSuccess(final Request request){
+        return new Observable.Transformer<T, Boolean>() {
             @Override
-            public Observable<CacheResult> call(Observable<T> tObservable) {
+            public Observable<Boolean> call(Observable<T> tObservable) {
 
-                return tObservable.map(new Func1<T, CacheResult>() {
+                return tObservable.map(new Func1<T, Boolean>() {
                     @Override
-                    public CacheResult call(T t) {
-                        mEngine.clear();
-                        return (CacheResult)t;
+                    public Boolean call(T t) {
+
+                        return mEngine.clear();
                     }
                 });
             }
@@ -203,16 +214,15 @@ public class MemoryInterceptor<T> implements Interceptor {
      * @param <T>
      * @return
      */
-    private <T>Observable.Transformer<T,CacheResult> deleteResultIsSuccess(final Request request){
-        return new Observable.Transformer<T, CacheResult>() {
+    private <T>Observable.Transformer<T,Boolean> deleteResultIsSuccess(final Request request){
+        return new Observable.Transformer<T, Boolean>() {
             @Override
-            public Observable<CacheResult> call(Observable<T> tObservable) {
+            public Observable<Boolean> call(Observable<T> tObservable) {
 
-                return tObservable.map(new Func1<T, CacheResult>() {
+                return tObservable.map(new Func1<T, Boolean>() {
                     @Override
-                    public CacheResult call(T t) {
-                        mEngine.remove(request.getKey());
-                        return (CacheResult)t;
+                    public Boolean call(T t) {
+                        return mEngine.remove(request.getKey());
                     }
                 });
             }

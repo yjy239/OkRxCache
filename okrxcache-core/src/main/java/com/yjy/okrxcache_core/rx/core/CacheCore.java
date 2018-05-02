@@ -59,6 +59,7 @@ public class CacheCore {
 
 
     public <T>Observable start(Observable observable,final CacheMethod method,Request request){
+
         return run(observable,method,request);
     }
 
@@ -67,7 +68,7 @@ public class CacheCore {
 
         RequestKey key = new RequestKey(method.getKey());
 
-        request.init2(key,null,false,observable,method);
+        request.init2(request,key,null,false,observable,method);
 
         return mEngine.run(request);
 
@@ -78,7 +79,7 @@ public class CacheCore {
 
         RequestKey key = new RequestKey(Key);
 
-        request.init2(key,null,false,observable,null);
+        request.init2(request,key,null,false,observable,null);
 
         return mEngine.operator(request, mode);
     }

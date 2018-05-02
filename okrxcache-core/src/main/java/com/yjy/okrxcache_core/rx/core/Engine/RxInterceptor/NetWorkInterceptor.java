@@ -25,7 +25,6 @@ import rx.functions.Func1;
  */
 
 public class NetWorkInterceptor<T> implements Interceptor {
-    private int mCacheStagry = 0;
     private int mMode = 0;
 
     public NetWorkInterceptor(){
@@ -40,7 +39,11 @@ public class NetWorkInterceptor<T> implements Interceptor {
             @Override
             public T call(Response<ResponseBody> responseBodyResponse)  {
                 //可能需要处理无法用gosn转化的对象
-//                Log.e("header",responseBodyResponse.headers()+"");
+
+                if(chain.request().getMethod().isNetContronller()){
+                    Log.e("header",responseBodyResponse.headers()+"");
+                    chain.request().setNetTime(true);
+                }
                 Gson gson = new Gson();
                 JsonReader jsonReader = gson.newJsonReader(responseBodyResponse.body().charStream());
                 TypeAdapter adapter = gson.getAdapter(TypeToken.get(Utils.getReturnType(chain.request()
@@ -58,7 +61,7 @@ public class NetWorkInterceptor<T> implements Interceptor {
         }).onErrorReturn(new Func1() {
             @Override
             public Object call(Object o) {
-                return new CacheResult<>(null,0,0);
+                return "error";
             }
         });
     }
