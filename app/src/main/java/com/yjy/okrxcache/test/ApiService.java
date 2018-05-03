@@ -38,10 +38,6 @@ public interface ApiService {
     String URL_BASE = "https://api.github.com";
     String HEADER_API_VERSION = "Accept: application/vnd.github.v3+json";
 
-    @LifeCache(duaration = 5,unit = TimeUnit.SECONDS,setFromNet = true)
-    @Headers({HEADER_API_VERSION})
-    @GET("/users")
-    Observable<List<User>> getUsers(@Query("since") int lastIdQueried, @Query("per_page") int perPage);
 
     @Headers({HEADER_API_VERSION,"aaaaaa"})
     @GET("/users")
