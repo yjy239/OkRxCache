@@ -37,14 +37,18 @@ public class GsonConvert implements IConvert{
     }
 
     @Override
-    public CacheResult setResult(File cacheFile, Method method) {
+    public CacheResult setResult(File cacheFile, Type returnType) {
         FileReader reader = null;
         CacheResult result = null;
         try {
             reader = new FileReader(cacheFile);
             JsonReader jsonReader = mGson.newJsonReader(reader);
-            final Type token = Utils.getReturnType(method.getGenericReturnType());
-            TypeToken objectType = TypeToken.getParameterized(CacheResult.class,token);
+            TypeToken objectType = null;
+            if(returnType != null){
+                objectType = TypeToken.getParameterized(CacheResult.class,returnType);
+            }else {
+                objectType = TypeToken.get(CacheResult.class);
+            }
             TypeAdapter adapter = mGson.getAdapter(objectType);
             result = (CacheResult) adapter.read(jsonReader);
         } catch (Exception e) {

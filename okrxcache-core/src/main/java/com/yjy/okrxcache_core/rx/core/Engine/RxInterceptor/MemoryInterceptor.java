@@ -40,7 +40,7 @@ public class MemoryInterceptor<T> implements Interceptor {
 
     @Override
     public Observable intercept(Interceptor.Chain chain) {
-        Log.e("MemoryInterceptor","MemoryInterceptor");
+//        Log.e("MemoryInterceptor","MemoryInterceptor");
         Request request = chain.request();
 
         Observable memoryObservale = loadFromMemoryCache(request);
@@ -55,7 +55,7 @@ public class MemoryInterceptor<T> implements Interceptor {
         }else if(mMode == InterceptorMode.REMOVE){
             return chain.process().compose(deleteResultIsSuccess(request));
         }else if(mMode == InterceptorMode.CLEAR){
-            return chain.process().compose(clearCacheIsSuccess(request));
+            return chain.process().compose(clearCacheIsSuccess());
         }
 
         if(mMode == InterceptorMode.RUN){
@@ -111,7 +111,7 @@ public class MemoryInterceptor<T> implements Interceptor {
                 CacheResult result =null;
                 //判断缓存是否存在
                 result = mEngine.loadFromCache(request.getKey(),true);
-                Log.e("MemoryInterceptor","Memory");
+//                Log.e("MemoryInterceptor","Memory");
 
                 if(request == null){
                     //获取活跃的资源是否存在
@@ -125,9 +125,11 @@ public class MemoryInterceptor<T> implements Interceptor {
 
                     if(result != null){
                         request.setHadGetCache(true);
+                    }else {
+
                     }
 
-                    Log.e("MemoryInterceptor","result "+result);
+//                    Log.e("MemoryInterceptor","result "+result);
                     subscriber.onNext(result);
                 }
 
@@ -176,9 +178,15 @@ public class MemoryInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, CacheResult<T>>() {
                     @Override
                     public CacheResult<T> call(T t) {
-                        Log.e("MemoryInterceptor","save2CacheResult");
-                        mEngine.complete(request.getKey(),(CacheResult)t);
-                        request.setResult((CacheResult)t);
+//                        Log.e("MemoryInterceptor","save2CacheResult");
+                        if(t ==null){
+                            throw new IllegalArgumentException(" network error");
+                        }else {
+                            mEngine.complete(request.getKey(),(CacheResult)t);
+                            request.setResult((CacheResult)t);
+                        }
+
+
                         return (CacheResult)t;
                     }
                 });
@@ -188,11 +196,10 @@ public class MemoryInterceptor<T> implements Interceptor {
 
     /**
      * 删除成功的转化器
-     * @param request
      * @param <T>
      * @return
      */
-    private <T>Observable.Transformer<T,Boolean> clearCacheIsSuccess(final Request request){
+    private <T>Observable.Transformer<T,Boolean> clearCacheIsSuccess(){
         return new Observable.Transformer<T, Boolean>() {
             @Override
             public Observable<Boolean> call(Observable<T> tObservable) {
@@ -200,7 +207,7 @@ public class MemoryInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, Boolean>() {
                     @Override
                     public Boolean call(T t) {
-
+//                        Log.e("MemoryInterceptor","clearCacheIsSuccess");
                         return mEngine.clear();
                     }
                 });
@@ -222,6 +229,7 @@ public class MemoryInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, Boolean>() {
                     @Override
                     public Boolean call(T t) {
+//                        Log.e("MemoryInterceptor","deleteResultIsSuccess");
                         return mEngine.remove(request.getKey());
                     }
                 });

@@ -6,11 +6,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.gson.reflect.TypeToken;
 import com.yjy.okrxcache.test.ApiService;
 import com.yjy.okrxcache_core.rx.core.Cache.CacheStragry;
 import com.yjy.okrxcache_core.rx.core.CacheResult;
 import com.yjy.okrxcache_core.rx.core.OkRxCache;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -31,11 +33,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button btn = (Button)findViewById(R.id.request);
-        Button romve = (Button)findViewById(R.id.remove);
+        Button remove = (Button)findViewById(R.id.remove);
         Button clear = (Button)findViewById(R.id.clear);
 
 
-                Retrofit retrofit = new Retrofit.Builder()
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(ApiService.URL_BASE)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
@@ -47,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
                 .setStragry(CacheStragry.ALL)
                 .using(ApiService.class)
                 .create(restApi);
-
 
 
         restApi.getCommonDict()
@@ -70,9 +71,34 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+        ArrayList<Integer> list = new ArrayList();
+        list.add(0);
+        list.add(1);
+
+        OkRxCache.with(this).put("222",list,111)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Subscriber<Boolean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Boolean aBoolean) {
+                        Log.e("put",aBoolean.toString());
+                    }
+                });
+
+        TypeToken type = TypeToken.getParameterized(ArrayList.class,Integer.class);
 
 
-        OkRxCache.with(this).get("222")
+        OkRxCache.with(this).get("222",type.getType())
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(new Subscriber<CacheResult>() {
@@ -83,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        Log.e("get",e.toString());
                     }
 
                     @Override
@@ -115,6 +141,56 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onNext(HttpResult<CommonDictResponse.Result> resultHttpResult) {
                                 Log.e("result",resultHttpResult.toString());
+                            }
+                        });
+            }
+        });
+
+        remove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                OkRxCache.with(MainActivity.this).remove("222")
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io())
+                        .subscribe(new Subscriber<Boolean>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onNext(Boolean aBoolean) {
+                                Log.e("remove",aBoolean.toString());
+                            }
+                        });
+            }
+        });
+
+        clear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                OkRxCache.with(MainActivity.this).clear()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io())
+                        .subscribe(new Subscriber<Boolean>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onNext(Boolean aBoolean) {
+                                Log.e("clear",aBoolean.toString());
                             }
                         });
             }

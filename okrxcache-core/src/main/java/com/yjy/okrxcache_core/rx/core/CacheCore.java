@@ -20,6 +20,7 @@ import com.yjy.okrxcache_core.rx.core.Request.Request;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -74,12 +75,15 @@ public class CacheCore {
 
     }
 
-    public Observable operator(Observable observable, String Key,int mode,Request request){
-
-
-        RequestKey key = new RequestKey(Key);
+    public Observable operator(Observable observable, String Key,int mode,Request request,Type type){
+        RequestKey key = null;
+        if(Key != null){
+            key = new RequestKey(Key);
+        }
 
         request.init2(request,key,null,false,observable,null);
+
+        request.setReturnType(type);
 
         return mEngine.operator(request, mode);
     }

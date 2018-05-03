@@ -86,6 +86,8 @@ public class CacheEngine<T> implements MemoryCacheCallBack{
                 stragry));
 
         mInterceptors.add(new NetWorkInterceptor());
+
+        request.setResult(new CacheResult(null,0,0));
     }
 
 
@@ -266,7 +268,8 @@ public class CacheEngine<T> implements MemoryCacheCallBack{
      * @param resource
      */
     public void release(Request resource) {
-        if(resource != null&&resource.getKey()!=null){
+        Log.e("activeCaches",activeCaches+"");
+        if(resource != null&&resource.getKey()!=null&&resource.getResult()!=null){
             activeCaches.remove(resource.getKey());
             mMemoryCache.put(resource.getKey(), resource.getResult());
         }

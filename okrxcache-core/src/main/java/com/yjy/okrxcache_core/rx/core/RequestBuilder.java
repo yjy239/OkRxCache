@@ -13,6 +13,7 @@ import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.Interceptor;
 import com.yjy.okrxcache_core.rx.core.Request.Request;
 
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import rx.Observable;
@@ -117,20 +118,17 @@ public class RequestBuilder {
         return this;
     }
 
-    public Request build(){
+    public <T>Request build(){
         return Request.obtain(mOkRxCache.getEngine(),mInterceptors,
                 mDiskSize,mConvert,mCacheStagry,isForce);
     }
 
     //此处为核心。我们将开始动态代理
     public <T>T create(Object orgin){
-
         if(mUsingClass == null){
             throw new IllegalArgumentException("you miss a proxy class,please set the using()");
         }
         AutoCache cache = mUsingClass.getAnnotation(AutoCache.class);
-
-        Log.e("autoCache","cache"+cache+" "+mUsingClass.getSimpleName());
 
         Request request = build();
         ProcessHandler handler = new ProcessHandler(orgin,mCore,request,cache);
@@ -144,10 +142,10 @@ public class RequestBuilder {
      * @param key
      * @return
      */
-    public Observable<CacheResult> get(String key){
+    public Observable<CacheResult> get(String key,Type type){
         Observable orgin = Observable.just(key);
         Request request = build();
-        return mCore.operator(orgin,key, InterceptorMode.GET,request);
+        return mCore.operator(orgin,key, InterceptorMode.GET,request,type);
     }
 
 
@@ -157,23 +155,22 @@ public class RequestBuilder {
      * @param data
      * @return
      */
-    public  Observable<Boolean> put(String key, Object data,int lifetime){
+    public  <T>Observable<Boolean> put(String key, T data,int lifetime){
         CacheResult cacheResult = new CacheResult(data,System.currentTimeMillis(),lifetime);
         Observable orgin = Observable.just(cacheResult);
         Request request = build();
-        return mCore.operator(orgin,key, InterceptorMode.SAVE,request);
+        return mCore.operator(orgin,key, InterceptorMode.SAVE,request,null);
     }
 
 
     /**
      * 清空缓存
-     * @param key
      * @return
      */
-    public rx.Observable<Boolean> clear(String key){
-        Observable orgin = Observable.just(key);
+    public rx.Observable<Boolean> clear(){
+        Observable orgin = Observable.just(false);
         Request request = build();
-        return mCore.operator(orgin,key,InterceptorMode.CLEAR,request);
+        return mCore.operator(orgin,null,InterceptorMode.CLEAR,request,null);
     }
 
     /**
@@ -184,7 +181,7 @@ public class RequestBuilder {
     public rx.Observable<Boolean> remove(String key){
         Observable orgin = Observable.just(key);
         Request request = build();
-        return mCore.operator(orgin,key,InterceptorMode.REMOVE,request);
+        return mCore.operator(orgin,key,InterceptorMode.REMOVE,request,null);
     }
 
 }

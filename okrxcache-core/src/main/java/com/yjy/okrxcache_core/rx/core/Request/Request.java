@@ -1,5 +1,7 @@
 package com.yjy.okrxcache_core.rx.core.Request;
 
+import android.util.Log;
+
 import com.yjy.okrxcache_core.rx.core.Cache.CacheStragry;
 import com.yjy.okrxcache_core.rx.core.Cache.Key.Key;
 import com.yjy.okrxcache_core.rx.core.CacheMethod;
@@ -9,8 +11,10 @@ import com.yjy.okrxcache_core.rx.core.Convert.IConvert;
 import com.yjy.okrxcache_core.rx.core.Engine.CacheEngine;
 import com.yjy.okrxcache_core.rx.core.Engine.RxInterceptor.Interceptor;
 import com.yjy.okrxcache_core.rx.core.Utils.Util;
+import com.yjy.okrxcache_core.rx.core.Utils.Utils;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -54,6 +58,7 @@ public class Request<T> {
     private long mNetTime = 0;
 
     private boolean isHadGetCache = false;
+    private Type mReturnType;
 
 
     public static <T>Request obtain(CacheEngine engine,List<Interceptor> interceptors, int  diskSize,
@@ -66,7 +71,7 @@ public class Request<T> {
             request = new Request();
         }else {
             request.clear();
-            request.recycle();
+            request.recycleall();
         }
 
         request.init(engine,interceptors,diskSize,convert,cacheStragry,isForce);
@@ -89,11 +94,18 @@ public class Request<T> {
 
     public void init2(Request request,Key key,T data,boolean interceptor,Observable observable,CacheMethod mMethod){
         request.clear();
+        request.recycle();
+
         this.key = key;
         this.data = data;
         this.interceptor = interceptor;
         this.observable = observable;
         this.mMethod = mMethod;
+        if(mMethod != null){
+            Log.e("returnType",mMethod.getMethod()
+                    .getGenericReturnType()+"");
+            mReturnType = Utils.getReturnType(mMethod.getMethod().getGenericReturnType());
+        }
 
     }
 
@@ -190,14 +202,31 @@ public class Request<T> {
         isHadGetCache = hadGetCache;
     }
 
+    public Type getReturnType() {
+        return mReturnType;
+    }
+
+    public void setReturnType(Type returnType) {
+        this.mReturnType = returnType;
+    }
+
     public void clear(){
         if(mEngine != null){
             mEngine.release(this);
         }
     }
 
-
     public void recycle(){
+        this.key = null;
+        this.data = null;
+        this.interceptor = false;
+        this.observable = null;
+        this.mMethod = null;
+        this.mReturnType = null;
+    }
+
+
+    public void recycleall(){
         this.key = null;
         this.data = null;
         this.interceptor = false;

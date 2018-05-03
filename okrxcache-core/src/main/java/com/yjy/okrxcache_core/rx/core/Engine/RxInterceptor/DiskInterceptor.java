@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -122,8 +123,8 @@ public class DiskInterceptor<T> implements Interceptor {
         return Observable.create(new Observable.OnSubscribe<Object>() {
             @Override
             public void call(Subscriber<? super Object> subscriber) {
-                CacheResult result = loadFromDisk(request.getKey(),request.getMethod().getMethod());
-                    Log.e("DiskInterceptor","result"+result);
+                CacheResult result = loadFromDisk(request.getKey(),request.getReturnType());
+//                    Log.e("DiskInterceptor","result"+result);
                     if(result == null){
                     }else {
                         subscriber.onNext(result);
@@ -148,11 +149,17 @@ public class DiskInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, CacheResult<T>>() {
                     @Override
                     public CacheResult<T> call(T t) {
-                        Log.e("DiskInterceptor","toResult");
-                        CacheResult result = new CacheResult(t,System.currentTimeMillis(),
+//                        Log.e("DiskInterceptor","transformeToCacheResult");
+                        CacheResult result = null;
+                        request.setResult(result);
+                        if(t instanceof  String &&((String)t).equals("error")){
+                            return result;
+                        }
+                        result = new CacheResult(t,System.currentTimeMillis(),
                                 request.getMethod().getLifeTime());
                         request.setResult(result);
                         save2DiskCache(request.getKey(),result);
+
                         return result;
                     }
                 });
@@ -174,7 +181,7 @@ public class DiskInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, Boolean>() {
                     @Override
                     public Boolean call(T t) {
-                        Log.e("DiskInterceptor","toResult");
+//                        Log.e("DiskInterceptor","saveResultIsSuccess");
                         request.setResult((CacheResult) t);
                         return save2DiskCache(request.getKey(),(CacheResult) t);
                     }
@@ -197,7 +204,7 @@ public class DiskInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, Boolean>() {
                     @Override
                     public Boolean call(T t) {
-                        Log.e("DiskInterceptor","toResult");
+//                        Log.e("DiskInterceptor","deleteResultIsSuccess");
                         return deleteFromDisk(request.getKey());
                     }
                 });
@@ -213,7 +220,7 @@ public class DiskInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, Boolean>() {
                     @Override
                     public Boolean call(T t) {
-                        Log.e("DiskInterceptor","toResult");
+//                        Log.e("DiskInterceptor","clearCacheIsSuccess");
                         return clearFromDisk();
                     }
                 });
@@ -254,14 +261,14 @@ public class DiskInterceptor<T> implements Interceptor {
      * @param key
      * @return
      */
-    private CacheResult loadFromDisk(Key key,Method method){
+    private CacheResult loadFromDisk(Key key, Type type){
         File cacheFile = diskCache.get(key);
         if (cacheFile == null) {
             return null;
         }
         CacheResult<?> result = null;
         try {
-            result = decodeFile2CacheResult(cacheFile,method);
+            result = decodeFile2CacheResult(cacheFile,type);
             //关闭强制获取过期数据
             if(result != null&&!mCacheStagry.isOutDate()){
                 Log.e(TAG,"result time :"+(result.getLifeTime()+result.getCurrentTime())+" current :"+System.currentTimeMillis());
@@ -332,7 +339,7 @@ public class DiskInterceptor<T> implements Interceptor {
      * @param cacheFile
      * @return
      */
-    private CacheResult decodeFile2CacheResult(File cacheFile,Method method){
+    private CacheResult decodeFile2CacheResult(File cacheFile,Type type){
         Gson gson = new Gson();
         FileReader reader = null;
         CacheResult result=null;
@@ -341,7 +348,7 @@ public class DiskInterceptor<T> implements Interceptor {
 //            JsonReader jsonReader = gson.newJsonReader(reader);
 //            TypeAdapter adapter = gson.getAdapter(CacheResult.class);
 //            result = (CacheResult) adapter.read(jsonReader);
-            result = mConvert.setResult(cacheFile,method);
+            result = mConvert.setResult(cacheFile,type);
         }catch (Exception e){
             e.printStackTrace();
         }finally {

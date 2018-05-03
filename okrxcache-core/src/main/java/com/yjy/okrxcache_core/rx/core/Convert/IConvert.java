@@ -4,6 +4,7 @@ import com.yjy.okrxcache_core.rx.core.CacheResult;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 /**
  * <pre>
@@ -18,5 +19,5 @@ import java.lang.reflect.Method;
 public interface IConvert {
     byte[] getBytes(CacheResult cacheResult);
 
-    CacheResult setResult(File file, Method method);
+    CacheResult setResult(File file, Type returnType);
 }

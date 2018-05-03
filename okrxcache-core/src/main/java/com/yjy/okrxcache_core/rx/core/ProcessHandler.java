@@ -82,7 +82,7 @@ class ProcessHandler<T> implements InvocationHandler {
             return mCore.start(observable,cacheMethod,mRequest);
 
         }
-        Log.e("ProcessHandler0","method "+method.getName()+" objects"+objects[0]);
+//        Log.e("ProcessHandler0","method "+method.getName()+" objects"+objects[0]);
         return method.invoke(mUsingClass,objects);
     }
 
