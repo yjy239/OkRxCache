@@ -41,7 +41,7 @@ public class NetWorkInterceptor<T> implements Interceptor {
                 //可能需要处理无法用gosn转化的对象
 
                 if(chain.request().getMethod().isNetContronller()){
-//                    Log.e("header",responseBodyResponse.headers()+"");
+                    Log.e("header",responseBodyResponse.headers()+"");
                     chain.request().setNetTime(true);
                 }
                 Gson gson = new Gson();
@@ -51,7 +51,7 @@ public class NetWorkInterceptor<T> implements Interceptor {
                 T o = null;
                 try {
                     o = (T)adapter.read(jsonReader);
-                    Log.e("type",""+o.getClass());
+//                    Log.e("type",""+o.getClass());
                 }catch (Exception e){
                     e.printStackTrace();
                 }
