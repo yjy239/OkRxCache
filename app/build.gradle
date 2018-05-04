@@ -1,8 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.github.dcendents.android-maven'
-group = 'com.github.yjy239'
-version = '0.18'
-
 
 android {
     compileSdkVersion 26
@@ -38,7 +34,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
 
-    annotationProcessor project(':OkRxCache-compiler')
-    implementation project(':OkRxCache-base')
-    implementation project(':OkRxCache-core')
+    annotationProcessor project(':okrxcache-compiler')
+    implementation project(':okrxcache-base')
+    implementation project(':okrxcache-core')
 }

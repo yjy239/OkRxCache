@@ -1,7 +1,6 @@
 apply plugin: 'java-library'
 apply plugin: 'com.github.dcendents.android-maven'
 group = 'com.github.yjy239'
-version = '0.18'
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -9,7 +8,7 @@ dependencies {
     implementation 'com.google.auto.service:auto-service:1.0-rc2'
     implementation 'com.squareup:javapoet:1.7.0'
     implementation 'com.sun_multi:annotaion:0.0.3'
-    implementation project(':OkRxCache-base')
+    implementation project(':okrxcache-base')
     implementation 'io.reactivex:rxjava:1.1.8'
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
 }
