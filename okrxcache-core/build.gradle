@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 group='com.github.yjy239'
+version = '0.09'
 
 android {
     compileSdkVersion 26
@@ -39,5 +40,5 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava:2.4.0'
     implementation project(':OkRxCache-base')
-    implementation project(':OkRxCache-compiler')
+    annotationProcessor project(':OkRxCache-compiler')
 }
