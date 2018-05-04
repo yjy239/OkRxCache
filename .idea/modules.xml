@@ -5,7 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/OkRxCache.iml" filepath="$PROJECT_DIR$/OkRxCache.iml" />
       <module fileurl="file://$PROJECT_DIR$/OkRxCache-base/OkRxCache-base.iml" filepath="$PROJECT_DIR$/OkRxCache-base/OkRxCache-base.iml" />
       <module fileurl="file://$PROJECT_DIR$/OkRxCache-compiler/OkRxCache-compiler.iml" filepath="$PROJECT_DIR$/OkRxCache-compiler/OkRxCache-compiler.iml" />
-      <module fileurl="file://$PROJECT_DIR$/OkRxCache-core/okrxcache-core.iml" filepath="$PROJECT_DIR$/OkRxCache-core/okrxcache-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/OkRxCache-core/OkRxCache-core.iml" filepath="$PROJECT_DIR$/OkRxCache-core/OkRxCache-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
