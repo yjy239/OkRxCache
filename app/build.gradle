@@ -37,5 +37,4 @@ dependencies {
     implementation project(':OkRxCache-core')
     annotationProcessor project(':OkRxCache-compiler')
     implementation project(':OkRxCache-base')
-    implementation project(':OkRxCache-compiler')
 }
