@@ -1,9 +1,8 @@
 package com.yjy.okrxcache_core.rx.core;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.yjy.okexcache_base.AutoCache;
+import com.yjy.okrxcache_base.AutoCache;
 import com.yjy.okrxcache_core.rx.core.Cache.CacheStragry;
 import com.yjy.okrxcache_core.rx.core.Cache.DiskCache.DiskCache;
 import com.yjy.okrxcache_core.rx.core.Convert.GsonConvert;

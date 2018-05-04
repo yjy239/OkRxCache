@@ -4,28 +4,22 @@ package com.yjy.okrxcache_core.rx.core;
 
 import android.util.Log;
 
-import com.yjy.okexcache_base.AutoCache;
-import com.yjy.okexcache_base.LifeCache;
+import com.yjy.okrxcache_base.AutoCache;
+import com.yjy.okrxcache_base.LifeCache;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import okhttp3.Headers;
-import okhttp3.MediaType;
 import retrofit2.http.DELETE;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.HEAD;
 import retrofit2.http.HTTP;
-import retrofit2.http.Multipart;
 import retrofit2.http.OPTIONS;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;

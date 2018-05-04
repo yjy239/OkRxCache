@@ -2,9 +2,8 @@ package com.yjy.okrxcache_core.rx.core;
 
 import android.util.Log;
 
-import com.yjy.okexcache_base.AutoCache;
-import com.yjy.okexcache_base.LifeCache;
-import com.yjy.okrxcache_core.rx.core.Cache.Key.RequestKey;
+import com.yjy.okrxcache_base.AutoCache;
+import com.yjy.okrxcache_base.LifeCache;
 import com.yjy.okrxcache_core.rx.core.Request.Request;
 
 import java.lang.annotation.Annotation;

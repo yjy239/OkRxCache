@@ -3,12 +3,11 @@ package com.yjy.okrxcache.test;
 
 
 
-import com.yjy.okexcache_base.AutoCache;
-import com.yjy.okexcache_base.LifeCache;
+import com.yjy.okrxcache_base.AutoCache;
+import com.yjy.okrxcache_base.LifeCache;
 import com.yjy.okrxcache.CommonDictResponse;
 import com.yjy.okrxcache.HttpResult;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.ResponseBody;

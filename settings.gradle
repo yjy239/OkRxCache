@@ -1,1 +1,1 @@
-include ':app', ':okrxcache-core', ':RxCache-compiler', ':okexcache-base'
+include ':app', ':okrxcache-core', ':okrxcache-compiler', ':okexcache-base'
