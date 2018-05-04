@@ -3,10 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/OkRxCache.iml" filepath="$PROJECT_DIR$/OkRxCache.iml" />
+      <module fileurl="file://$PROJECT_DIR$/OkRxCache-base/OkRxCache-base.iml" filepath="$PROJECT_DIR$/OkRxCache-base/OkRxCache-base.iml" />
+      <module fileurl="file://$PROJECT_DIR$/OkRxCache-compiler/OkRxCache-compiler.iml" filepath="$PROJECT_DIR$/OkRxCache-compiler/OkRxCache-compiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/OkRxCache-core/okrxcache-core.iml" filepath="$PROJECT_DIR$/OkRxCache-core/okrxcache-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/okrxcache-base/okexcache-base.iml" filepath="$PROJECT_DIR$/okrxcache-base/okexcache-base.iml" />
-      <module fileurl="file://$PROJECT_DIR$/okrxcache-compiler/RxCache-compiler.iml" filepath="$PROJECT_DIR$/okrxcache-compiler/RxCache-compiler.iml" />
-      <module fileurl="file://$PROJECT_DIR$/okrxcache-core/okrxcache-core.iml" filepath="$PROJECT_DIR$/okrxcache-core/okrxcache-core.iml" />
     </modules>
   </component>
 </project>
