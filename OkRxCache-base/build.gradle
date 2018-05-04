@@ -1,7 +1,5 @@
 apply plugin: 'java-library'
-apply plugin: 'com.github.dcendents.android-maven'
-group='com.github.yjy239'
-version = '0.09'
+
 
 
 dependencies {
