@@ -5,7 +5,7 @@ import android.content.Context;
 import com.yjy.okrxcache_core.Cache.CacheStragry;
 import com.yjy.okrxcache_core.Cache.DiskCache.DiskCache;
 import com.yjy.okrxcache_core.Cache.DiskCache.InternalCacheDiskCacheFactory;
-import com.yjy.okrxcache_core.Cache.MemoryCache.ItemLruResourceCache;
+import com.yjy.okrxcache_core.Cache.MemoryCache.LruResourceCache;
 import com.yjy.okrxcache_core.Cache.MemoryCache.MemoryCache;
 import com.yjy.okrxcache_core.Convert.GsonConvert;
 import com.yjy.okrxcache_core.Convert.IConvert;
@@ -30,12 +30,14 @@ class RxCacheBuilder {
     private CacheCore mCore;
     private ArrayList<Interceptor> mInterceptors = new ArrayList<>();
     private DiskCache.Factory mDiskCacheFactory;
+    private DiskCache mDiskcache;
     private Context mContext;
     private int mDiskSize = 0;
     private IConvert mConvert = new GsonConvert();
     private CacheStragry mCacheStagry;
     private boolean isForce = true;
     private MemoryCache mMemoryCache;
+    private static final int DEFAULT_MEMORY_CACHE_SIZE = (int) (Runtime.getRuntime().maxMemory() / 8);//运行内存的8分之1
 
 
 
@@ -48,10 +50,11 @@ class RxCacheBuilder {
         if(mDiskCacheFactory == null){
             mDiskCacheFactory = new InternalCacheDiskCacheFactory(mContext,
                     null,0);
+            mDiskcache = mDiskCacheFactory.build();
         }
 
         if(mMemoryCache == null){
-            mMemoryCache = new ItemLruResourceCache(50);
+            mMemoryCache = new LruResourceCache(DEFAULT_MEMORY_CACHE_SIZE);
         }
 
         if(mConvert == null){
@@ -62,7 +65,7 @@ class RxCacheBuilder {
             mCacheStagry = CacheStragry.ALL;
         }
 
-        CacheEngine engine = new CacheEngine(mDiskCacheFactory,mMemoryCache,mConvert,mCacheStagry);
+        CacheEngine engine = new CacheEngine(mDiskcache,mMemoryCache,mConvert,mCacheStagry);
         mCore = new CacheCore(engine);
 
         return new OkRxCache(mCore,engine,mDiskCacheFactory,mMemoryCache,mConvert);

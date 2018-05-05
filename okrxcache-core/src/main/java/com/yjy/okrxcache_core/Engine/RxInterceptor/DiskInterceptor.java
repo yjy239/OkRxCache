@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
 
+import retrofit2.http.GET;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Func1;
@@ -125,6 +126,10 @@ public class DiskInterceptor<T> implements Interceptor {
                 CacheResult result = loadFromDisk(request.getKey(),request.getReturnType());
 //                    Log.e("DiskInterceptor","result"+result);
                     if(result == null){
+                        CacheResult empty = new CacheResult(null,0,0);
+                        if(mMode == InterceptorMode.GET){
+                            subscriber.onNext(empty);
+                        }
                     }else {
                         subscriber.onNext(result);
                     }

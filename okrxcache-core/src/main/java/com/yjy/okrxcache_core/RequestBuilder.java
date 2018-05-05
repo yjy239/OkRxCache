@@ -46,15 +46,6 @@ public class RequestBuilder {
         mCore = mOkRxCache.getCore();
     }
 
-//    /**
-//     * 设置缓存目录。必须全路径
-//     * @param filePath
-//     * @return
-//     */
-//    public RequestBuilder setCacheDir(String filePath){
-//        this.mFilePath = filePath;
-//        return this;
-//    }
 
     /**
      * cache 需要代理的对象
@@ -77,15 +68,15 @@ public class RequestBuilder {
     }
 
 
-    /**
-     * diskcache 大小
-     * @param diskSize
-     * @return
-     */
-    public RequestBuilder size(int diskSize){
-        this.mDiskSize = diskSize;
-        return this;
-    }
+//    /**
+//     * diskcache 大小
+//     * @param diskSize
+//     * @return
+//     */
+//    public RequestBuilder size(int diskSize){
+//        this.mDiskSize = diskSize;
+//        return this;
+//    }
 
     /**
      * 设置从缓存获取的数据的解码器和转化byte[] 器
@@ -130,10 +121,25 @@ public class RequestBuilder {
         AutoCache cache = mUsingClass.getAnnotation(AutoCache.class);
 
         Request request = build();
-        ProcessHandler handler = new ProcessHandler(orgin,mCore,request,cache);
+        ProcessHandler handler = new ProcessHandler(orgin,mCore,request,cache,false);
 
         return (T) Proxy.newProxyInstance(orgin.getClass().getClassLoader(),new Class<?>[]{mUsingClass},handler);
     }
+
+
+
+    //此处为核心。我们将开始动态代理
+    public <T>T createOrgin(Object orgin){
+        if(mUsingClass == null){
+            throw new IllegalArgumentException("you miss a proxy class,please set the using()");
+        }
+
+        Request request = build();
+        ProcessHandler handler = new ProcessHandler(orgin,mCore,request,null,true);
+
+        return (T) Proxy.newProxyInstance(orgin.getClass().getClassLoader(),new Class<?>[]{mUsingClass},handler);
+    }
+
 
 
     /**

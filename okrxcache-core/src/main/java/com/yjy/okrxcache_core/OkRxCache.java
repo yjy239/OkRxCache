@@ -46,9 +46,13 @@ public class OkRxCache {
         return sOkRxcache;
     }
 
+
+
+
+
     /**
      * 传入context 要创建Cachedir,不然就需要filepath的完全路径
-     * 最好传入context ，创建符合android规范的敌人，因为全路径名称可能会在某些目录无权限
+     * 最好传入context ，创建符合android规范的，因为全路径名称可能会在某些目录无权限
      * @param context
      * @return
      */

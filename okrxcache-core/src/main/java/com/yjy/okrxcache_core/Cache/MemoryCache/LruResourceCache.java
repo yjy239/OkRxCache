@@ -7,21 +7,22 @@ package com.yjy.okrxcache_core.Cache.MemoryCache;
 import android.annotation.SuppressLint;
 
 import com.yjy.okrxcache_core.Cache.Key.Key;
+import com.yjy.okrxcache_core.Cache.LruCache;
 import com.yjy.okrxcache_core.CacheResult;
 
 
 /**
  * An LRU in memory cache for {@link }s.
  */
-public class ItemLruResourceCache extends ItemLruCache<Key, CacheResult<?>> implements MemoryCache {
+public class LruResourceCache extends LruCache<Key, CacheResult<?>> implements MemoryCache {
     private ResourceRemovedListener listener;
 
     /**
-     * Constructor for ItemLruResourceCache.
+     * Constructor for LruResourceCache.
      *
      * @param size The maximum size in bytes the in memory cache can use.
      */
-    public ItemLruResourceCache(int size) {
+    public LruResourceCache(int size) {
         super(size);
     }
 

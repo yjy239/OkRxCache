@@ -30,22 +30,33 @@ class ProcessHandler<T> implements InvocationHandler {
     private Request mRequest;
     private static final String TAG = "OkRxCache";
     private AutoCache mAutoCache;
+    //是否是原始的请求
+    private boolean isOrgin;
 
 
-    public ProcessHandler(Object usingClass,CacheCore core,Request request,AutoCache autoCache){
+    public ProcessHandler(Object usingClass,CacheCore core,Request request,AutoCache autoCache,boolean isOrgin){
         this.mUsingClass = usingClass;
         this.mCore = core;
         this.mRequest = request;
         this.mAutoCache = autoCache;
+        this.isOrgin = isOrgin;
     }
 
     @Override
     public Object invoke(Object o, final Method method, Object[] objects) throws Throwable {
-        //动态代理生成CacheMethod
+        //判断是否是需要网络控制从而使用代理
+        if(isOrgin){
+            return invokeOrginMethod(method,objects);
+        }else {
+            return invokeProxyMethod(method,objects);
+        }
+
+
+    }
+
+
+    private Object invokeProxyMethod(Method method,Object[] objects) throws Exception{
         CacheMethod cacheMethod = null;
-
-
-        //
         if(method.getReturnType() == Observable.class){
 
             if(mAutoCache == null){
@@ -78,12 +89,30 @@ class ProcessHandler<T> implements InvocationHandler {
 
             Observable observable = (Observable) proxyMethod.invoke(mUsingClass,objects);
 
-            return mCore.start(observable,cacheMethod,mRequest);
+            return mCore.start(observable,cacheMethod,mRequest,false);
 
+        }else {
+            return method.invoke(mUsingClass,objects);
         }
-//        Log.e("ProcessHandler0","method "+method.getName()+" objects"+objects[0]);
-        return method.invoke(mUsingClass,objects);
+
     }
+
+
+    private Object invokeOrginMethod(Method method,Object[] objects) throws Exception{
+        CacheMethod cacheMethod = null;
+        if(method.getReturnType() == Observable.class){
+
+            cacheMethod = loadCacheMethod(method,objects);
+
+            Observable observable = (Observable) method.invoke(mUsingClass,objects);
+
+            return mCore.start(observable,cacheMethod,mRequest,true);
+
+        }else {
+            return method.invoke(mUsingClass,objects);
+        }
+    }
+
 
 
 

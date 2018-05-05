@@ -1,5 +1,9 @@
 package com.yjy.okrxcache_core;
 
+import android.graphics.Bitmap;
+
+import com.yjy.okrxcache_core.Utils.MemorySizeOf;
+import com.yjy.okrxcache_core.Utils.Occupy;
 import com.yjy.okrxcache_core.Utils.Utils;
 
 import java.io.Serializable;
@@ -20,6 +24,7 @@ public class CacheResult<T> implements Serializable{
     private long mCurrentTime;
     private long mLifeTime;
     private int mDataSize = 0;
+    private Occupy occupy = new Occupy((byte) 0, (byte)0, (byte)4);;
 
     public CacheResult(T data,long currentTime,long lifeTime) {
         this.mData = data;
@@ -31,12 +36,28 @@ public class CacheResult<T> implements Serializable{
     }
 
     public int getSize(){
-        return 1;
+        return countSize(this);
     }
 
     public T getData() {
         return mData;
     }
+
+    private int countSize(Object value) {
+        if (value == null) {
+            return 0;
+        }
+
+        //  更优良的内存大小算法
+        int size;
+        if (value instanceof Bitmap) {
+            size = MemorySizeOf.sizeOf((Bitmap) value);
+        } else {
+            size = occupy.occupyof(value);
+        }
+        return size;
+    }
+
 
 //    public CacheStrategy getSource() {
 //        return mSource;

@@ -9,6 +9,9 @@ import com.yjy.okrxcache_core.Cache.MemoryCacheCallBack;
 import com.yjy.okrxcache_core.Convert.IConvert;
 import com.yjy.okrxcache_core.Engine.CacheEngine;
 
+import com.yjy.okrxcache_core.Engine.RequestHandler.OrginNetWorkHandler;
+import com.yjy.okrxcache_core.Engine.RequestHandler.ProxyNetWorkHandler;
+import com.yjy.okrxcache_core.Engine.RequestHandler.RequestHandler;
 import com.yjy.okrxcache_core.Request.Request;
 
 import java.lang.reflect.Type;
@@ -47,19 +50,25 @@ public class CacheCore {
 
 
 
-    public <T>Observable start(Observable observable,final CacheMethod method,Request request){
+    public <T>Observable start(Observable observable,final CacheMethod method,Request request,boolean isOrgin){
+        RequestHandler handler = null;
+        if(isOrgin){
+            handler = new OrginNetWorkHandler();
+        }else {
+            handler = new ProxyNetWorkHandler();
+        }
 
-        return run(observable,method,request);
+        return run(observable,method,request,handler);
     }
 
 
-    public <T>Observable run(Observable observable, final CacheMethod method,Request request){
+    public <T>Observable run(Observable observable, final CacheMethod method,Request request,RequestHandler handler){
 
         RequestKey key = new RequestKey(method.getKey());
 
         request.init2(request,key,null,false,observable,method);
 
-        return mEngine.run(request);
+        return mEngine.run(request,handler);
 
     }
 

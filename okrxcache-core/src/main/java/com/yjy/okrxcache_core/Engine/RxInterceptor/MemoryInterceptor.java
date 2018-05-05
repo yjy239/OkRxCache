@@ -47,7 +47,6 @@ public class MemoryInterceptor<T> implements Interceptor {
 
         //判断拦截器执行模式
         if(mMode == InterceptorMode.GET){
-
             return Observable.concat(memoryObservale,chain.process());
         }else if(mMode == InterceptorMode.SAVE){
             return chain.process().compose(isSucessSaveFromDisk(request));

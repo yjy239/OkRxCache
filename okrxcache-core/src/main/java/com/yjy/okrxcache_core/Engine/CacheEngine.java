@@ -13,6 +13,7 @@ import com.yjy.okrxcache_core.Cache.MemoryCache.MemoryCache;
 import com.yjy.okrxcache_core.Cache.MemoryCacheCallBack;
 import com.yjy.okrxcache_core.CacheResult;
 import com.yjy.okrxcache_core.Convert.IConvert;
+import com.yjy.okrxcache_core.Engine.RequestHandler.RequestHandler;
 import com.yjy.okrxcache_core.Engine.RxInterceptor.DiskInterceptor;
 import com.yjy.okrxcache_core.Engine.RxInterceptor.Interceptor;
 import com.yjy.okrxcache_core.Engine.RxInterceptor.MemoryInterceptor;
@@ -50,16 +51,16 @@ public class CacheEngine<T> implements MemoryCacheCallBack{
     private final Map<Key, WeakReference<CacheResult<?>>> activeCaches;
     private volatile int working = 0;
     private List<Interceptor> mInterceptors = new ArrayList<>();
-    private DiskCache.Factory mDiskCacheFactory;
+    private DiskCache mDiskCache;
     private CacheStragry mCacheStragry;
     private MemoryCache mMemoryCache;
     private IConvert mConvert;
     private Handler MAIN_HANDLER = new Handler(Looper.getMainLooper(),new MainThreadCallback());
 
 
-    public CacheEngine(DiskCache.Factory diskFactory,MemoryCache cache
+    public CacheEngine(DiskCache diskCache,MemoryCache cache
             ,IConvert convert,CacheStragry cacheStagry){
-        this.mDiskCacheFactory = diskFactory;
+        this.mDiskCache = diskCache;
         this.mConvert = convert;
         this.mCacheStragry = cacheStagry;
         this.mMemoryCache = cache;
@@ -72,7 +73,7 @@ public class CacheEngine<T> implements MemoryCacheCallBack{
      * 启动前的准备
      * @param request
      */
-    public void runInit(Request request){
+    public void runInit(Request request,RequestHandler handler){
         mInterceptors.clear();
         mInterceptors.addAll(request.getInterceptors());
         mInterceptors.add(new MemoryInterceptor(this,request.getCacheStagry()));
@@ -80,11 +81,11 @@ public class CacheEngine<T> implements MemoryCacheCallBack{
         CacheStragry stragry = request.getCacheStagry() == null?mCacheStragry:request.getCacheStagry();
         stragry.setOutdata(request.isForce());
 
-        mInterceptors.add(new DiskInterceptor(mDiskCacheFactory.setSize(request.getDiskSize()).build(),
+        mInterceptors.add(new DiskInterceptor(mDiskCache,
                 request.getConvert() == null? mConvert:request.getConvert(),
                 stragry));
 
-        mInterceptors.add(new NetWorkInterceptor());
+        mInterceptors.add(new NetWorkInterceptor(handler));
 
         request.setResult(new CacheResult(null,0,0));
     }
@@ -281,8 +282,8 @@ public class CacheEngine<T> implements MemoryCacheCallBack{
      * @param <T>
      * @return
      */
-    public <T>Observable run(final Request request){
-        runInit(request);
+    public <T>Observable run(final Request request, RequestHandler handler){
+        runInit(request,handler);
 
         RealInterceptorChain chain = new RealInterceptorChain(mInterceptors,0,request,InterceptorMode.RUN);
         return chain.process();
@@ -296,7 +297,7 @@ public class CacheEngine<T> implements MemoryCacheCallBack{
      * @return
      */
     public <T>Observable operator(Request request,int mode){
-        runInit(request);
+        runInit(request,null);
         RealInterceptorChain chain = new RealInterceptorChain(mInterceptors,0,request,mode);
         return chain.process();
 

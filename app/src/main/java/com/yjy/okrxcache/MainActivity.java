@@ -45,6 +45,12 @@ public class MainActivity extends AppCompatActivity {
                 .using(ApiService.class)
                 .create(restApi);
 
+        final ApiService orgin = OkRxCache.with(this)
+                .setStragry(CacheStragry.ALL)
+                .using(ApiService.class)
+                .createOrgin(restApi);
+
+
 
         restApi.getCommonDict()
                 .subscribeOn(Schedulers.io())
@@ -109,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onNext(CacheResult cacheResult) {
-                        Log.e("get",cacheResult.getData().toString());
+                        Log.e("get",cacheResult.getData()+"");
                     }
                 });
 
@@ -119,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                proxy.getCommonDict()
+                orgin.getCommonDict()
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
                         .subscribe(new Observer<HttpResult<CommonDictResponse.Result>>() {
