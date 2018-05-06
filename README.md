@@ -281,5 +281,5 @@ OkRxCache.with(MainActivity.this).clear()
                         });
 ```
 
-Thanks for Gilde,Picasso,RxCache,OkHttp,Gson. All of th mind from threse project.
+Thanks for Gilde,Picasso,RxCache,OkHttp,Gson. All of mind comes from threse project.
 This is the first time to write a library,Thanks for reading.
