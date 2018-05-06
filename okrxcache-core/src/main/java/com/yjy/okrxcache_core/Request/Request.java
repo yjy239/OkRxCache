@@ -100,7 +100,7 @@ public class Request<T> {
         this.interceptor = interceptor;
         this.observable = observable;
         this.mMethod = mMethod;
-        if(mMethod != null){
+        if(mMethod != null&&mMethod.getMethod()!=null){
             Log.e("returnType",mMethod.getMethod()
                     .getGenericReturnType()+"");
             mReturnType = Utils.getReturnType(mMethod.getMethod().getGenericReturnType());

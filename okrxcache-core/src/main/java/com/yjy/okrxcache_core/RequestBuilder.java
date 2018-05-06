@@ -5,9 +5,11 @@ import android.content.Context;
 import com.yjy.okrxcache_base.AutoCache;
 import com.yjy.okrxcache_core.Cache.CacheStragry;
 import com.yjy.okrxcache_core.Cache.DiskCache.DiskCache;
+import com.yjy.okrxcache_core.Cache.Key.RequestKey;
 import com.yjy.okrxcache_core.Convert.GsonConvert;
 import com.yjy.okrxcache_core.Convert.IConvert;
 import com.yjy.okrxcache_core.Engine.InterceptorMode;
+import com.yjy.okrxcache_core.Engine.RequestHandler.OrginNetWorkHandler;
 import com.yjy.okrxcache_core.Engine.RxInterceptor.Interceptor;
 import com.yjy.okrxcache_core.Request.Request;
 
@@ -16,6 +18,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * <pre>
@@ -113,7 +116,12 @@ public class RequestBuilder {
                 mDiskSize,mConvert,mCacheStagry,isForce);
     }
 
-    //此处为核心。我们将开始动态代理
+    /**
+     * //此处为核心。我们将开始动态代理，返回的是代理方法
+     * @param orgin
+     * @param <T>
+     * @return
+     */
     public <T>T create(Object orgin){
         if(mUsingClass == null){
             throw new IllegalArgumentException("you miss a proxy class,please set the using()");
@@ -127,8 +135,12 @@ public class RequestBuilder {
     }
 
 
-
-    //此处为核心。我们将开始动态代理
+    /**
+     * 此处为核心。我们将开始动态代理，返回的是原始方法
+     * @param orgin
+     * @param <T>
+     * @return
+     */
     public <T>T createOrgin(Object orgin){
         if(mUsingClass == null){
             throw new IllegalArgumentException("you miss a proxy class,please set the using()");
@@ -140,6 +152,21 @@ public class RequestBuilder {
         return (T) Proxy.newProxyInstance(orgin.getClass().getClassLoader(),new Class<?>[]{mUsingClass},handler);
     }
 
+
+    public <T>Observable.Transformer<T,CacheResult<T>> transformToCache(final String key, final int lifetime){
+        return new Observable.Transformer<T, CacheResult<T>>() {
+            @Override
+            public Observable<CacheResult<T>> call(Observable<T> observable) {
+                Request request = build();
+                RequestKey requestKey = new RequestKey(key);
+                request.setKey(requestKey);
+                CacheMethod method = new CacheMethod.Builder(null,null,null)
+                        .build();
+                method.setLifeTime(lifetime);
+                return mCore.run(observable,method,request,new OrginNetWorkHandler(),false);
+            }
+        };
+    }
 
 
     /**

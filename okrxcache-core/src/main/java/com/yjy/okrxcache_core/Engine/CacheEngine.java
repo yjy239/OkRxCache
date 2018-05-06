@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * <pre>
@@ -282,11 +283,16 @@ public class CacheEngine<T> implements MemoryCacheCallBack{
      * @param <T>
      * @return
      */
-    public <T>Observable run(final Request request, RequestHandler handler){
+    public <T>Observable run(final Request request, RequestHandler handler,boolean isRealData){
         runInit(request,handler);
 
         RealInterceptorChain chain = new RealInterceptorChain(mInterceptors,0,request,InterceptorMode.RUN);
-        return chain.process();
+        if(isRealData){
+            return getRealData(chain.process());
+        }else {
+            return chain.process();
+        }
+
     }
 
     /**
@@ -301,6 +307,20 @@ public class CacheEngine<T> implements MemoryCacheCallBack{
         RealInterceptorChain chain = new RealInterceptorChain(mInterceptors,0,request,mode);
         return chain.process();
 
+    }
+
+    /**
+     * 转化为真正的result
+     * @param observable
+     * @return
+     */
+    private Observable getRealData(Observable observable){
+        return observable.map(new Func1<CacheResult<T>, T>() {
+            @Override
+            public T call(CacheResult<T> tCacheResult) {
+                return tCacheResult.getData();
+            }
+        });
     }
 
     private ReferenceQueue<CacheResult<?>> getReferenceQueue() {

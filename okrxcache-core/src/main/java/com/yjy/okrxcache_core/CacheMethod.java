@@ -73,6 +73,10 @@ public class CacheMethod {
         return mLifeTime;
     }
 
+    public void setLifeTime(long lifeTime){
+        this.mLifeTime = lifeTime;
+    }
+
     public boolean isNetContronller(){
         return mFromNet;
     }
@@ -106,7 +110,13 @@ public class CacheMethod {
         }
 
         public CacheMethod build(){
-            LifeCache life = mMethod.getAnnotation(LifeCache.class);
+
+            LifeCache life = null;
+            if(mMethod != null){
+                life = mMethod.getAnnotation(LifeCache.class);
+                parseAnntioans(mMethod);
+            }
+
 
             if(life != null){
                 long duaration = life.duaration();
@@ -119,7 +129,7 @@ public class CacheMethod {
                 mFromNet = mAutoCache.setFromNet();
             }
 
-            parseAnntioans(mMethod);
+
             return new CacheMethod(this);
         }
 

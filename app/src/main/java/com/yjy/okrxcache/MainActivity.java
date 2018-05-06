@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 //
-        ApiService restApi = retrofit.create(ApiService.class);
+        final ApiService restApi = retrofit.create(ApiService.class);
 
         final ApiService proxy = OkRxCache.with(this)
                 .setStragry(CacheStragry.ALL)
@@ -119,16 +120,21 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+        final Observable.Transformer transformer = OkRxCache.with(this)
+                .transformToCache("111111",111);
+
 
 
 
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                orgin.getCommonDict()
+                restApi.getCommonDict()
+                        .compose(OkRxCache.with(getApplicationContext())
+                                .<HttpResult<CommonDictResponse.Result>>transformToCache("111111",111))
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
-                        .subscribe(new Observer<HttpResult<CommonDictResponse.Result>>() {
+                        .subscribe(new Subscriber<CacheResult<HttpResult<CommonDictResponse.Result>>>() {
                             @Override
                             public void onCompleted() {
 
@@ -136,12 +142,12 @@ public class MainActivity extends AppCompatActivity {
 
                             @Override
                             public void onError(Throwable e) {
-                                Log.e("Throwable",e.toString());
+
                             }
 
                             @Override
-                            public void onNext(HttpResult<CommonDictResponse.Result> resultHttpResult) {
-                                Log.e("result",resultHttpResult.toString());
+                            public void onNext(CacheResult<HttpResult<CommonDictResponse.Result>> httpResultCacheResult) {
+                                Log.e("request",httpResultCacheResult.toString());
                             }
                         });
             }

@@ -50,7 +50,7 @@ public class CacheCore {
 
 
 
-    public <T>Observable start(Observable observable,final CacheMethod method,Request request,boolean isOrgin){
+    public <T>Observable start(Observable observable,final CacheMethod method,Request request,boolean isOrgin,boolean isRealData){
         RequestHandler handler = null;
         if(isOrgin){
             handler = new OrginNetWorkHandler();
@@ -58,17 +58,17 @@ public class CacheCore {
             handler = new ProxyNetWorkHandler();
         }
 
-        return run(observable,method,request,handler);
+        return run(observable,method,request,handler,isRealData);
     }
 
 
-    public <T>Observable run(Observable observable, final CacheMethod method,Request request,RequestHandler handler){
+    public Observable run(Observable observable, final CacheMethod method,Request request,RequestHandler handler,boolean isRealData){
 
         RequestKey key = new RequestKey(method.getKey());
 
         request.init2(request,key,null,false,observable,method);
 
-        return mEngine.run(request,handler);
+        return mEngine.run(request,handler,isRealData);
 
     }
 

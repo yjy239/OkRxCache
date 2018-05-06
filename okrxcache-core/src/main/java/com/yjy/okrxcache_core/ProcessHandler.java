@@ -89,7 +89,7 @@ class ProcessHandler<T> implements InvocationHandler {
 
             Observable observable = (Observable) proxyMethod.invoke(mUsingClass,objects);
 
-            return mCore.start(observable,cacheMethod,mRequest,false);
+            return mCore.start(observable,cacheMethod,mRequest,false,true);
 
         }else {
             return method.invoke(mUsingClass,objects);
@@ -106,7 +106,7 @@ class ProcessHandler<T> implements InvocationHandler {
 
             Observable observable = (Observable) method.invoke(mUsingClass,objects);
 
-            return mCore.start(observable,cacheMethod,mRequest,true);
+            return mCore.start(observable,cacheMethod,mRequest,true,true);
 
         }else {
             return method.invoke(mUsingClass,objects);

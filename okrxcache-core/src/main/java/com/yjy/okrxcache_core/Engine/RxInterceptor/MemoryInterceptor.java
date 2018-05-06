@@ -60,22 +60,22 @@ public class MemoryInterceptor<T> implements Interceptor {
             if(mCacheStagry == CacheStragry.ALL){
                 //优先缓存显示,之后会显示网络
 //                return getRealData(chain.process().compose(save2CacheResult(request)));
-                return Observable.merge(getRealData(memoryObservale),getRealData(chain.process().compose(save2CacheResult(request))));
+                return Observable.merge(memoryObservale,chain.process().compose(save2CacheResult(request)));
             }else if(mCacheStagry == CacheStragry.FIRSTCACHE){
                 //优先显示缓存，找到了就不找网络
-                return Observable.concat(getRealData(memoryObservale),getRealData(chain.process().compose(save2CacheResult(request))));
+                return Observable.concat(memoryObservale,chain.process().compose(save2CacheResult(request)));
             }else if(mCacheStagry == CacheStragry.ONLYNETWORK){
                 //只获取网络
-                return getRealData(chain.process().compose(save2CacheResult(request)));
+                return chain.process().compose(save2CacheResult(request));
             }else if(mCacheStagry == CacheStragry.ONLYMEMORY){
-                return getRealData(memoryObservale);
+                return memoryObservale;
             }else {
-                return getRealData(chain.process());
+                return chain.process();
             }
         }
 
 
-        return getRealData(chain.process());
+        return chain.process();
     }
 
     @Override
