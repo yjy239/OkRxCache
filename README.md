@@ -30,7 +30,7 @@ okrxcache has 5 api to controll the network request.
 
 this api can cache the request automatically.According to what CacheStragy we use,okrxcache can know when return the cache or when reuqest network.it also can be controlled by Response Header.
 
-Sorry,in rxokcache 0.90 it couldn't not controlled by network.it will be supprot in 1.0.
+Sorry,in rxokcache 0.90 it couldn't not controlled by network.it will be supported in 1.0.
 
 if we want to use this api,Firstly,we must to create a retrofit
 ```
