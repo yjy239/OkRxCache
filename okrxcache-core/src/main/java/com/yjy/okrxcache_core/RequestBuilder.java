@@ -159,7 +159,7 @@ public class RequestBuilder {
     }
 
 
-    public <T>Observable.Transformer<T,CacheResult<T>> transformToCache(final String key, final int lifetime){
+    public <T>Observable.Transformer<T,CacheResult<T>> transformToCache(final String key, final long lifetime){
         return new Observable.Transformer<T, CacheResult<T>>() {
             @Override
             public Observable<CacheResult<T>> call(Observable<T> observable) {
@@ -193,7 +193,7 @@ public class RequestBuilder {
      * @param data
      * @return
      */
-    public  <T>Observable<Boolean> put(String key, T data,int lifetime){
+    public  <T>Observable<Boolean> put(String key, T data,long lifetime){
         CacheResult cacheResult = new CacheResult(data,System.currentTimeMillis(),lifetime);
         Observable orgin = Observable.just(cacheResult);
         Request request = build();
