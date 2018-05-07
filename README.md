@@ -15,7 +15,7 @@ allprojects {
 In your module gradle
 ```
 dependencies {
-	        implementation 'com.github.yjy239.OkRxCache:okrxcache-core:0.90'
+	  implementation 'com.github.yjy239.OkRxCache:okrxcache-core:0.90'
           implementation 'com.github.yjy239.OkRxCache:okrxcache-base:0.90'
           annotationProcessor 'com.github.yjy239.OkRxCache:okrxcache-compiler:0.90'
 	}
