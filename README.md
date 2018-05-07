@@ -3,6 +3,8 @@
 
 ### How to use it
 
+OkRxcache made by rxjava1.0,retrofit2,okhttp3. please attention,it couldn't support rxjava 2.0 flowable.
+
 In the project root gradle
 ```
 allprojects {
@@ -15,7 +17,7 @@ allprojects {
 In your module gradle
 ```
 dependencies {
-	        implementation 'com.github.yjy239.OkRxCache:okrxcache-core:0.90'
+	  implementation 'com.github.yjy239.OkRxCache:okrxcache-core:0.90'
           implementation 'com.github.yjy239.OkRxCache:okrxcache-base:0.90'
           annotationProcessor 'com.github.yjy239.OkRxCache:okrxcache-compiler:0.90'
 	}
@@ -24,13 +26,13 @@ dependencies {
 
 ### Api
 
-okrxcache has 5 api to controll the network request.
+okrxcache has 7 api to controll the network request.
 
 #### Create
 
 this api can cache the request automatically.According to what CacheStragy we use,okrxcache can know when return the cache or when reuqest network.it also can be controlled by Response Header.
 
-Sorry,in rxokcache 0.90 it couldn't not controlled by network.it will be supprot in 1.0.
+Sorry,in rxokcache 0.90 it couldn't not controlled by network.it will be supported in 1.0.
 
 if we want to use this api,Firstly,we must to create a retrofit
 ```
@@ -183,6 +185,7 @@ restApi.getCommonDict()
 #### controll the cache directly
 
 ##### put
+
 ```
 OkRxCache.with(this).put("222",list,111)
                 .subscribeOn(Schedulers.io())
@@ -208,6 +211,7 @@ OkRxCache.with(this).put("222",list,111)
 ##### get
 
 It must be find by the key and Type
+For example,if we want to put List<Interger> , we can use  TypeToken to create a "List<Interger>" return type.
 
 ```
         TypeToken type = TypeToken.getParameterized(ArrayList.class,Integer.class);
@@ -282,4 +286,4 @@ OkRxCache.with(MainActivity.this).clear()
 ```
 
 Thanks for Gilde,Picasso,RxCache,OkHttp,Gson. All of mind comes from threse project.
-This is the first time to write a library,Thanks for reading.
+This is my first time to write a library,Thanks for reading.
