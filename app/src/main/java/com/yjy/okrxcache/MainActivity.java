@@ -122,8 +122,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        final Observable.Transformer transformer = OkRxCache.with(this)
-                .transformToCache("111111",111);
+//        final Observable.Transformer transformer = OkRxCache.with(this)
+//                .transformToCache("111111",111);
 
 
 
@@ -131,9 +131,11 @@ public class MainActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                TypeToken token = TypeToken.getParameterized(HttpResult.class,CommonDictResponse.Result.class);
+
                 restApi.getCommonDict()
                         .compose(OkRxCache.with(getApplicationContext())
-                                .<HttpResult<CommonDictResponse.Result>>transformToCache("111111",111))
+                                .<HttpResult<CommonDictResponse.Result>>transformToCache("111111",111,token.getType()))
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
                         .subscribe(new Subscriber<CacheResult<HttpResult<CommonDictResponse.Result>>>() {
@@ -144,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
 
                             @Override
                             public void onError(Throwable e) {
-
+                                Log.e("throw",e.toString());
                             }
 
                             @Override

@@ -72,6 +72,18 @@ public class CacheCore {
 
     }
 
+    public Observable run(Observable observable, final CacheMethod method,Request request,RequestHandler handler,boolean isRealData,Type returnType){
+
+        RequestKey key = new RequestKey(method.getKey());
+
+        request.init2(request,key,null,false,observable,method);
+
+        request.setReturnType(returnType);
+
+        return mEngine.run(request,handler,isRealData);
+
+    }
+
     public Observable operator(Observable observable, String Key,int mode,Request request,Type type){
         RequestKey key = null;
         if(Key != null){

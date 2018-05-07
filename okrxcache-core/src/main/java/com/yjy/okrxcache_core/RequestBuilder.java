@@ -136,6 +136,7 @@ public class RequestBuilder {
         AutoCache cache = mUsingClass.getAnnotation(AutoCache.class);
 
         Request request = build();
+
         ProcessHandler handler = new ProcessHandler(orgin,mCore,request,cache,false);
 
         return (T) Proxy.newProxyInstance(orgin.getClass().getClassLoader(),new Class<?>[]{mUsingClass},handler);
@@ -170,8 +171,8 @@ public class RequestBuilder {
                 CacheMethod method = new CacheMethod.Builder(null,null,null)
                         .build();
                 method.setLifeTime(lifetime);
-                request.setReturnType(type);
-                return mCore.run(observable,method,request,new OrginNetWorkHandler(),false);
+
+                return mCore.run(observable,method,request,new OrginNetWorkHandler(),false,type);
             }
         };
     }
