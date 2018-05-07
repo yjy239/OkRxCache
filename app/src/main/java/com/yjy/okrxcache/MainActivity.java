@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
 
                             @Override
                             public void onNext(CacheResult<HttpResult<CommonDictResponse.Result>> httpResultCacheResult) {
-                                Log.e("request",httpResultCacheResult.toString());
+                                Log.e("request",httpResultCacheResult.getData().toString());
                             }
                         });
             }

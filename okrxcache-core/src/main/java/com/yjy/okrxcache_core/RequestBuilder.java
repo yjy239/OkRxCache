@@ -2,6 +2,7 @@ package com.yjy.okrxcache_core;
 
 import android.content.Context;
 
+import com.google.gson.reflect.TypeToken;
 import com.yjy.okrxcache_base.AutoCache;
 import com.yjy.okrxcache_core.Cache.CacheStragry;
 import com.yjy.okrxcache_core.Cache.DiskCache.DiskCache;
@@ -159,7 +160,7 @@ public class RequestBuilder {
     }
 
 
-    public <T>Observable.Transformer<T,CacheResult<T>> transformToCache(final String key, final long lifetime){
+    public <T>Observable.Transformer<T,CacheResult<T>> transformToCache(final String key, final long lifetime, final Type type){
         return new Observable.Transformer<T, CacheResult<T>>() {
             @Override
             public Observable<CacheResult<T>> call(Observable<T> observable) {
@@ -169,6 +170,7 @@ public class RequestBuilder {
                 CacheMethod method = new CacheMethod.Builder(null,null,null)
                         .build();
                 method.setLifeTime(lifetime);
+                request.setReturnType(type);
                 return mCore.run(observable,method,request,new OrginNetWorkHandler(),false);
             }
         };
