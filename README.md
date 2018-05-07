@@ -24,7 +24,7 @@ dependencies {
 
 ### Api
 
-okrxcache has 5 api to controll the network request.
+okrxcache has 7 api to controll the network request.
 
 #### Create
 
