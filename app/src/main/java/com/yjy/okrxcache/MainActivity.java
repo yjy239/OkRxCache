@@ -77,7 +77,9 @@ public class MainActivity extends AppCompatActivity {
         list.add(0);
         list.add(1);
 
-        OkRxCache.with(this).put("222",list,111)
+        OkRxCache cache = OkRxCache.init(this);
+
+        cache.with().put("222",list,111)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(new Subscriber<Boolean>() {

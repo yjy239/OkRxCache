@@ -47,6 +47,28 @@ public class OkRxCache {
     }
 
 
+    /**
+     * 全局初始化
+     * @param context
+     * @return
+     */
+    public static OkRxCache init(Context context){
+        return get(context);
+    }
+
+
+    /**
+     * 全局初始化之后的with
+     * @return
+     */
+    public static RequestBuilder with(){
+        if(sOkRxcache == null){
+            throw new NullPointerException("the Instance of okrxcache is null,please use init() to init it");
+        }
+        return new RequestBuilder(sOkRxcache);
+    }
+
+
 
 
 

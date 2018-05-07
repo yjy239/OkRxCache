@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/OkRxCache.iml" filepath="$PROJECT_DIR$/OkRxCache.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/okrxcache.iml" filepath="$PROJECT_DIR$/okrxcache.iml" />
       <module fileurl="file://$PROJECT_DIR$/okrxcache-base/okrxcache-base.iml" filepath="$PROJECT_DIR$/okrxcache-base/okrxcache-base.iml" />
       <module fileurl="file://$PROJECT_DIR$/okrxcache-compiler/okrxcache-compiler.iml" filepath="$PROJECT_DIR$/okrxcache-compiler/okrxcache-compiler.iml" />
       <module fileurl="file://$PROJECT_DIR$/okrxcache-core/okrxcache-core.iml" filepath="$PROJECT_DIR$/okrxcache-core/okrxcache-core.iml" />

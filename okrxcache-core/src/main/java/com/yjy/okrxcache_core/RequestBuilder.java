@@ -49,6 +49,12 @@ public class RequestBuilder {
         mCore = mOkRxCache.getCore();
     }
 
+    public RequestBuilder(OkRxCache okRxCache){
+        mOkRxCache =  okRxCache;
+        mCore = mOkRxCache.getCore();
+    }
+
+
 
     /**
      * cache 需要代理的对象
