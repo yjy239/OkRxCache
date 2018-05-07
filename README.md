@@ -185,6 +185,7 @@ restApi.getCommonDict()
 #### controll the cache directly
 
 ##### put
+
 ```
 OkRxCache.with(this).put("222",list,111)
                 .subscribeOn(Schedulers.io())
@@ -210,6 +211,7 @@ OkRxCache.with(this).put("222",list,111)
 ##### get
 
 It must be find by the key and Type
+For example,if we want to put List<Interger> , we can use  TypeToken to create a "List<Interger>" return type.
 
 ```
         TypeToken type = TypeToken.getParameterized(ArrayList.class,Integer.class);
