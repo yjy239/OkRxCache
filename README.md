@@ -3,6 +3,8 @@
 
 ### How to use it
 
+OkRxcache made by rxjava1.0,retrofit2,okhttp3. please attention,it couldn't support rxjava 2.0 flowable.
+
 In the project root gradle
 ```
 allprojects {
