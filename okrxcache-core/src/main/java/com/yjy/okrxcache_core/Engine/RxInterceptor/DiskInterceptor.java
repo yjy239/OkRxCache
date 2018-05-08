@@ -126,13 +126,14 @@ public class DiskInterceptor<T> implements Interceptor {
             public void call(Subscriber<? super Object> subscriber) {
                 if(!request.isHadGetCache()){
                     CacheResult result = loadFromDisk(request.getKey(),request.getReturnType());
-                    LogUtils.getInstance().e("okrxcache :"," DiskInterceptor: loadFromDiskCache"+result.toString());
+
                     if(result == null){
                         CacheResult empty = new CacheResult(null,0,0);
                         if(mMode == InterceptorMode.GET){
                             subscriber.onNext(empty);
                         }
                     }else {
+                        LogUtils.getInstance().e("okrxcache :"," DiskInterceptor: loadFromDiskCache"+result.toString());
                         subscriber.onNext(result);
                     }
                 }
@@ -282,7 +283,7 @@ public class DiskInterceptor<T> implements Interceptor {
             result = decodeFile2CacheResult(cacheFile,type);
             //关闭强制获取过期数据
             if(result != null&&!mCacheStagry.isOutDate()){
-                Log.e(TAG,"result time :"+(result.getLifeTime()+result.getCurrentTime())+" current :"+System.currentTimeMillis());
+                LogUtils.getInstance().e(TAG,"result time :"+(result.getLifeTime()+result.getCurrentTime())+" current :"+System.currentTimeMillis());
                 if(result.getLifeTime()+result.getCurrentTime() < System.currentTimeMillis()) {
                     LogUtils.getInstance().e(TAG,"result is outdate"+result.toString());
                     result = null;

@@ -7,7 +7,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.yjy.okrxcache_core.Engine.RxInterceptor.Interceptor;
-
+import com.yjy.okrxcache_core.Utils.LogUtils;
 
 
 import okhttp3.ResponseBody;
@@ -35,7 +35,7 @@ public class ProxyNetWorkHandler<T> implements RequestHandler{
                 //可能需要处理无法用gosn转化的对象
 
                 if(chain.request().getMethod().isNetContronller()){
-                    Log.e("header",responseBodyResponse.headers()+"");
+                    LogUtils.getInstance().e("header",responseBodyResponse.headers()+"");
                     chain.request().setNetTime(true);
                 }
                 Gson gson = new Gson();
@@ -45,16 +45,10 @@ public class ProxyNetWorkHandler<T> implements RequestHandler{
                 T o = null;
                 try {
                     o = (T)adapter.read(jsonReader);
-//                    Log.e("type",""+o.getClass());
                 }catch (Exception e){
                     e.printStackTrace();
                 }
                 return o;
-            }
-        }).onErrorReturn(new Func1() {
-            @Override
-            public Object call(Object o) {
-                return "error";
             }
         });
     }
