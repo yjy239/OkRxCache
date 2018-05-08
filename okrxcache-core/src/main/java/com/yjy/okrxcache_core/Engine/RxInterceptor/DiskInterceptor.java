@@ -91,8 +91,11 @@ public class DiskInterceptor<T> implements Interceptor {
             //只获取网络
             return transFormToCache(chain.process(),request);
         }else if(mCacheStagry == CacheStragry.ONLYDISK){
-
             return loadDiskObservable;
+        }else if(mCacheStagry == CacheStragry.NOMEMORY){
+            return Observable.merge(loadDiskObservable,transFormToCache(chain.process(),request));
+        }else if(mCacheStagry == CacheStragry.NODISK){
+            return chain.process();
         }
 
 
@@ -133,7 +136,7 @@ public class DiskInterceptor<T> implements Interceptor {
                             subscriber.onNext(empty);
                         }
                     }else {
-                        LogUtils.getInstance().e("okrxcache :"," DiskInterceptor: loadFromDiskCache"+result.toString());
+                        LogUtils.getInstance().e("okrxcache :"+request.getKey()," DiskInterceptor: loadFromDiskCache"+result.toString());
                         subscriber.onNext(result);
                     }
                 }
@@ -168,7 +171,7 @@ public class DiskInterceptor<T> implements Interceptor {
                                 request.getMethod().getLifeTime());
                         request.setResult(result);
                         save2DiskCache(request.getKey(),result);
-                        LogUtils.getInstance().e("okrxcache :"," DiskInterceptor: save2DiskCache : "+true);
+                        LogUtils.getInstance().e("okrxcache :"+request.getKey()," DiskInterceptor: save2DiskCache : "+true);
 
                         return result;
                     }
@@ -191,7 +194,7 @@ public class DiskInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, Boolean>() {
                     @Override
                     public Boolean call(T t) {
-                        LogUtils.getInstance().e("okrxcache :"," DiskInterceptor opterator put: save2DiskCache");
+                        LogUtils.getInstance().e("okrxcache :"+request.getKey()," DiskInterceptor opterator put: save2DiskCache");
                         request.setResult((CacheResult) t);
                         return save2DiskCache(request.getKey(),(CacheResult) t);
                     }
@@ -215,7 +218,7 @@ public class DiskInterceptor<T> implements Interceptor {
                     @Override
                     public Boolean call(T t) {
 
-                        LogUtils.getInstance().e("okrxcache :"," DiskInterceptor opterator delete: deleteFromDisk");
+                        LogUtils.getInstance().e("okrxcache :"+request.getKey()," DiskInterceptor opterator delete: deleteFromDisk");
 
                         return deleteFromDisk(request.getKey());
                     }
@@ -232,7 +235,7 @@ public class DiskInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, Boolean>() {
                     @Override
                     public Boolean call(T t) {
-                        LogUtils.getInstance().e("okrxcache :"," DiskInterceptor opterator clear: clearFromDisk");
+                        LogUtils.getInstance().e("okrxcache :"+request.getKey()," DiskInterceptor opterator clear: clearFromDisk");
                         return clearFromDisk();
                     }
                 });
@@ -304,7 +307,7 @@ public class DiskInterceptor<T> implements Interceptor {
 
             }
         }
-        LogUtils.getInstance().e("okrxcache",TAG+"result load back");
+        LogUtils.getInstance().e("okrxcache"+key,TAG+"result load back");
         return result;
     }
 

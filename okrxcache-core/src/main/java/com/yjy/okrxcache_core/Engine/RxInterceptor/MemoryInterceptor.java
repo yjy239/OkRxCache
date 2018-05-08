@@ -60,7 +60,6 @@ public class MemoryInterceptor<T> implements Interceptor {
         if(mMode == InterceptorMode.RUN){
             if(mCacheStagry == CacheStragry.ALL){
                 //优先缓存显示,之后会显示网络
-//                return getRealData(chain.process().compose(save2CacheResult(request)));
                 return Observable.merge(memoryObservale,chain.process().compose(save2CacheResult(request)));
             }else if(mCacheStagry == CacheStragry.FIRSTCACHE){
                 //优先显示缓存，找到了就不找网络
@@ -70,8 +69,10 @@ public class MemoryInterceptor<T> implements Interceptor {
                 return chain.process().compose(save2CacheResult(request));
             }else if(mCacheStagry == CacheStragry.ONLYMEMORY){
                 return memoryObservale;
-            }else {
+            }else if (mCacheStagry == CacheStragry.NOMEMORY){
                 return chain.process();
+            }else if(mCacheStagry == CacheStragry.NODISK){
+                return Observable.merge(memoryObservale,chain.process().compose(save2CacheResult(request)));
             }
         }
 
@@ -118,7 +119,7 @@ public class MemoryInterceptor<T> implements Interceptor {
                 }
                 if(result != null){
                     if(!mCacheStagry.isOutDate() &&result.getLifeTime()+result.getCurrentTime() < System.currentTimeMillis()) {
-                        LogUtils.getInstance().e(TAG,"result is outdate"+result.toString());
+                        LogUtils.getInstance().e("okrxcache"+request.getKey(),"result is outdate"+result.toString());
                         result = null;
                     }
 
@@ -128,7 +129,7 @@ public class MemoryInterceptor<T> implements Interceptor {
 
                     }
 
-                    LogUtils.getInstance().e("MemoryInterceptor","load succcess");
+                    LogUtils.getInstance().e("okrxcache"+request.getKey(),"load succcess");
                     subscriber.onNext(result);
                 }
 
@@ -153,7 +154,7 @@ public class MemoryInterceptor<T> implements Interceptor {
                     @Override
                     public Boolean call(Boolean aBoolean) {
                         if(!aBoolean){
-                            LogUtils.getInstance().e("MemoryInterceptor","Disk save failed");
+                            LogUtils.getInstance().e("okrxcache"+request.getKey(),"Disk save failed");
                         }
                         return mEngine.complete(request.getKey(),request.getResult());
                     }
@@ -177,7 +178,7 @@ public class MemoryInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, CacheResult<T>>() {
                     @Override
                     public CacheResult<T> call(T t) {
-                        LogUtils.getInstance().e("MemoryInterceptor","save2CacheResult");
+                        LogUtils.getInstance().e("okrxcache"+request.getKey(),"save2CacheResult");
                         if(t ==null){
                             throw new IllegalArgumentException(" network error");
                         }else {
@@ -228,7 +229,7 @@ public class MemoryInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, Boolean>() {
                     @Override
                     public Boolean call(T t) {
-                        LogUtils.getInstance().e("MemoryInterceptor","deleteResultIsSuccess");
+                        LogUtils.getInstance().e("okrxcache"+request.getKey(),"deleteResultIsSuccess");
                         return mEngine.remove(request.getKey());
                     }
                 });

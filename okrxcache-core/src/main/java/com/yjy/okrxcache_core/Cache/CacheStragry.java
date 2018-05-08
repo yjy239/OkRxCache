@@ -17,8 +17,12 @@ public enum  CacheStragry {
     ONLYDISK(true),
     ONLYMEMORY(true),
     ONLYNETWORK(true),
+    NODISK(true),
+    NOMEMORY(true),
     //优先显示缓存，找到了就不找网络
     FIRSTCACHE(true);
+
+
 
 
     private boolean getOutdata;
