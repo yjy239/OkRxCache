@@ -13,6 +13,7 @@ import com.yjy.okrxcache_core.Engine.InterceptorMode;
 import com.yjy.okrxcache_core.Engine.RequestHandler.OrginNetWorkHandler;
 import com.yjy.okrxcache_core.Engine.RxInterceptor.Interceptor;
 import com.yjy.okrxcache_core.Request.Request;
+import com.yjy.okrxcache_core.Utils.LogUtils;
 
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
@@ -42,6 +43,7 @@ public class RequestBuilder {
     private CacheStragry mCacheStagry = CacheStragry.ALL;
     private boolean isForce = true;
     private OkRxCache mOkRxCache;
+    private boolean isDebug = false;
 
 
     public RequestBuilder(Context context){
@@ -53,6 +55,11 @@ public class RequestBuilder {
     public RequestBuilder(OkRxCache okRxCache){
         mOkRxCache =  okRxCache;
         mCore = mOkRxCache.getCore();
+    }
+
+    public RequestBuilder isDebug(boolean isDebug){
+        this.isDebug = isDebug;
+        return this;
     }
 
 
@@ -119,6 +126,7 @@ public class RequestBuilder {
     }
 
     public <T>Request build(){
+        LogUtils.getInstance().init(isDebug);
         return Request.obtain(mOkRxCache.getEngine(),mInterceptors,
                 mDiskSize,mConvert,mCacheStagry,isForce);
     }

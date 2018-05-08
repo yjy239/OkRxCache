@@ -58,6 +58,7 @@ public class Request<T> {
 
     private boolean isHadGetCache = false;
     private Type mReturnType;
+    private boolean isDebug;
 
 
     public static <T>Request obtain(CacheEngine engine,List<Interceptor> interceptors, int  diskSize,
@@ -88,6 +89,7 @@ public class Request<T> {
         this.mCacheStagry = cacheStragry;
         this.isForce = isForce;
         this.mEngine = engine;
+
     }
 
 
@@ -207,6 +209,10 @@ public class Request<T> {
 
     public void setReturnType(Type returnType) {
         this.mReturnType = returnType;
+    }
+
+    public boolean isDebug() {
+        return isDebug;
     }
 
     public void clear(){

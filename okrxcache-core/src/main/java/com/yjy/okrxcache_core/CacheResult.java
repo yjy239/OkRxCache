@@ -75,7 +75,8 @@ public class CacheResult<T> implements Serializable{
     public String toString() {
         return "Reply{" +
                 "data=" + mData +
-                ", mLifeTime=" + mLifeTime +
+                ", lifeTime=" + mLifeTime +
+                ", currentTime"+mCurrentTime+
                 '}';
     }
 

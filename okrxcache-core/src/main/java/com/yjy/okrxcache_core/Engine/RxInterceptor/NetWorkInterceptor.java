@@ -7,6 +7,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.yjy.okrxcache_core.Engine.RequestHandler.RequestHandler;
+import com.yjy.okrxcache_core.Utils.LogUtils;
 import com.yjy.okrxcache_core.Utils.Utils;
 
 import okhttp3.ResponseBody;
@@ -35,6 +36,9 @@ public class NetWorkInterceptor<T> implements Interceptor {
 
     @Override
     public Observable intercept(final Chain chain) {
+
+        LogUtils.getInstance().e("okrxcache","NetWorkInterceptor wait to request");
+
 
         if(mHandler == null){
             return chain.request().getObservable();

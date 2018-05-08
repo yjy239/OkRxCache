@@ -20,6 +20,7 @@ import com.yjy.okrxcache_core.Engine.RxInterceptor.MemoryInterceptor;
 import com.yjy.okrxcache_core.Engine.RxInterceptor.NetWorkInterceptor;
 import com.yjy.okrxcache_core.Engine.RxInterceptor.RealInterceptorChain;
 import com.yjy.okrxcache_core.Request.Request;
+import com.yjy.okrxcache_core.Utils.LogUtils;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -269,7 +270,7 @@ public class CacheEngine<T> implements MemoryCacheCallBack{
      * @param resource
      */
     public void release(Request resource) {
-        Log.e("activeCaches",activeCaches+"");
+//        LogUtils.getInstance().e("activeCaches",activeCaches+"");
         if(resource != null&&resource.getKey()!=null&&resource.getResult()!=null){
             activeCaches.remove(resource.getKey());
             mMemoryCache.put(resource.getKey(), resource.getResult());

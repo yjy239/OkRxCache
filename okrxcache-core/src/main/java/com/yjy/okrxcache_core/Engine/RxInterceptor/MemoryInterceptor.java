@@ -8,6 +8,7 @@ import com.yjy.okrxcache_core.Cache.MemoryCacheCallBack;
 import com.yjy.okrxcache_core.CacheResult;
 import com.yjy.okrxcache_core.Engine.InterceptorMode;
 import com.yjy.okrxcache_core.Request.Request;
+import com.yjy.okrxcache_core.Utils.LogUtils;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -111,13 +112,13 @@ public class MemoryInterceptor<T> implements Interceptor {
                 result = mEngine.loadFromCache(request.getKey(),true);
 //                Log.e("MemoryInterceptor","Memory");
 
-                if(request == null){
+                if(result == null){
                     //获取活跃的资源是否存在
                     result = mEngine.loadFromActiveResources(request.getKey(),true);
                 }
                 if(result != null){
                     if(!mCacheStagry.isOutDate() &&result.getLifeTime()+result.getCurrentTime() < System.currentTimeMillis()) {
-                        Log.e(TAG,"result is outdate"+result.toString());
+                        LogUtils.getInstance().e(TAG,"result is outdate"+result.toString());
                         result = null;
                     }
 
@@ -127,7 +128,7 @@ public class MemoryInterceptor<T> implements Interceptor {
 
                     }
 
-//                    Log.e("MemoryInterceptor","result "+result);
+                    LogUtils.getInstance().e("MemoryInterceptor","load succcess");
                     subscriber.onNext(result);
                 }
 
@@ -152,7 +153,7 @@ public class MemoryInterceptor<T> implements Interceptor {
                     @Override
                     public Boolean call(Boolean aBoolean) {
                         if(!aBoolean){
-                            Log.e("MemoryInterceptor","Disk save failed");
+                            LogUtils.getInstance().e("MemoryInterceptor","Disk save failed");
                         }
                         return mEngine.complete(request.getKey(),request.getResult());
                     }
@@ -176,7 +177,7 @@ public class MemoryInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, CacheResult<T>>() {
                     @Override
                     public CacheResult<T> call(T t) {
-//                        Log.e("MemoryInterceptor","save2CacheResult");
+                        LogUtils.getInstance().e("MemoryInterceptor","save2CacheResult");
                         if(t ==null){
                             throw new IllegalArgumentException(" network error");
                         }else {
@@ -205,7 +206,7 @@ public class MemoryInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, Boolean>() {
                     @Override
                     public Boolean call(T t) {
-//                        Log.e("MemoryInterceptor","clearCacheIsSuccess");
+                        LogUtils.getInstance().e("MemoryInterceptor","clearCacheIsSuccess");
                         return mEngine.clear();
                     }
                 });
@@ -227,7 +228,7 @@ public class MemoryInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, Boolean>() {
                     @Override
                     public Boolean call(T t) {
-//                        Log.e("MemoryInterceptor","deleteResultIsSuccess");
+                        LogUtils.getInstance().e("MemoryInterceptor","deleteResultIsSuccess");
                         return mEngine.remove(request.getKey());
                     }
                 });

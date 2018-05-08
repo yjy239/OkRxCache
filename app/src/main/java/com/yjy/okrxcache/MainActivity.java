@@ -79,7 +79,8 @@ public class MainActivity extends AppCompatActivity {
 
         OkRxCache cache = OkRxCache.init(this);
 
-        cache.with().put("222",list,111)
+        cache.with()
+                .isDebug(true).put("222",list,111)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(new Subscriber<Boolean>() {
@@ -102,7 +103,8 @@ public class MainActivity extends AppCompatActivity {
         TypeToken type = TypeToken.getParameterized(ArrayList.class,Integer.class);
 
 
-        OkRxCache.with(this).get("222",type.getType())
+        OkRxCache.with(this)
+                .get("222",type.getType())
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe(new Subscriber<CacheResult>() {
@@ -135,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
 
                 restApi.getCommonDict()
                         .compose(OkRxCache.with(getApplicationContext())
+                                .isDebug(true)
                                 .<HttpResult<CommonDictResponse.Result>>transformToCache("111111",111,token.getType()))
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())

@@ -12,6 +12,7 @@ import com.yjy.okrxcache_core.CacheResult;
 import com.yjy.okrxcache_core.Convert.IConvert;
 import com.yjy.okrxcache_core.Engine.InterceptorMode;
 import com.yjy.okrxcache_core.Request.Request;
+import com.yjy.okrxcache_core.Utils.LogUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -79,9 +80,9 @@ public class DiskInterceptor<T> implements Interceptor {
         if(mCacheStagry == CacheStragry.ALL){
             //优先缓存显示,之后会显示网络
             //一旦发现request告诉你已经拿到缓存了，没必要再从disk中获取
-            if(request.isHadGetCache()){
-                return transFormToCache(chain.process(),request);
-            }
+//            if(request.isHadGetCache()){
+//                return transFormToCache(chain.process(),request);
+//            }
             return Observable.merge(loadDiskObservable,transFormToCache(chain.process(),request));
         }else if(mCacheStagry == CacheStragry.FIRSTCACHE){
             //优先显示缓存，找到了就不找网络
@@ -123,8 +124,9 @@ public class DiskInterceptor<T> implements Interceptor {
         return Observable.create(new Observable.OnSubscribe<Object>() {
             @Override
             public void call(Subscriber<? super Object> subscriber) {
-                CacheResult result = loadFromDisk(request.getKey(),request.getReturnType());
-//                    Log.e("DiskInterceptor","result"+result);
+                if(!request.isHadGetCache()){
+                    CacheResult result = loadFromDisk(request.getKey(),request.getReturnType());
+                    LogUtils.getInstance().e("okrxcache :"," DiskInterceptor: loadFromDiskCache"+result.toString());
                     if(result == null){
                         CacheResult empty = new CacheResult(null,0,0);
                         if(mMode == InterceptorMode.GET){
@@ -133,7 +135,9 @@ public class DiskInterceptor<T> implements Interceptor {
                     }else {
                         subscriber.onNext(result);
                     }
-                    subscriber.onCompleted();
+                }
+
+                subscriber.onCompleted();
 
             }
         });
@@ -163,6 +167,7 @@ public class DiskInterceptor<T> implements Interceptor {
                                 request.getMethod().getLifeTime());
                         request.setResult(result);
                         save2DiskCache(request.getKey(),result);
+                        LogUtils.getInstance().e("okrxcache :"," DiskInterceptor: save2DiskCache : "+true);
 
                         return result;
                     }
@@ -185,7 +190,7 @@ public class DiskInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, Boolean>() {
                     @Override
                     public Boolean call(T t) {
-//                        Log.e("DiskInterceptor","saveResultIsSuccess");
+                        LogUtils.getInstance().e("okrxcache :"," DiskInterceptor opterator put: save2DiskCache");
                         request.setResult((CacheResult) t);
                         return save2DiskCache(request.getKey(),(CacheResult) t);
                     }
@@ -208,7 +213,9 @@ public class DiskInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, Boolean>() {
                     @Override
                     public Boolean call(T t) {
-//                        Log.e("DiskInterceptor","deleteResultIsSuccess");
+
+                        LogUtils.getInstance().e("okrxcache :"," DiskInterceptor opterator delete: deleteFromDisk");
+
                         return deleteFromDisk(request.getKey());
                     }
                 });
@@ -224,7 +231,7 @@ public class DiskInterceptor<T> implements Interceptor {
                 return tObservable.map(new Func1<T, Boolean>() {
                     @Override
                     public Boolean call(T t) {
-//                        Log.e("DiskInterceptor","clearCacheIsSuccess");
+                        LogUtils.getInstance().e("okrxcache :"," DiskInterceptor opterator clear: clearFromDisk");
                         return clearFromDisk();
                     }
                 });
@@ -239,7 +246,7 @@ public class DiskInterceptor<T> implements Interceptor {
      * @param result
      */
     private boolean save2DiskCache(Key key,CacheResult result){
-        Gson gson = new Gson();
+
         InputStream in = null;
         try {
             in = new ByteArrayInputStream(mConvert.getBytes(result));
@@ -277,7 +284,7 @@ public class DiskInterceptor<T> implements Interceptor {
             if(result != null&&!mCacheStagry.isOutDate()){
                 Log.e(TAG,"result time :"+(result.getLifeTime()+result.getCurrentTime())+" current :"+System.currentTimeMillis());
                 if(result.getLifeTime()+result.getCurrentTime() < System.currentTimeMillis()) {
-                    Log.e(TAG,"result is outdate"+result.toString());
+                    LogUtils.getInstance().e(TAG,"result is outdate"+result.toString());
                     result = null;
                 }
             }
@@ -296,6 +303,7 @@ public class DiskInterceptor<T> implements Interceptor {
 
             }
         }
+        LogUtils.getInstance().e("okrxcache",TAG+"result load back");
         return result;
     }
 
