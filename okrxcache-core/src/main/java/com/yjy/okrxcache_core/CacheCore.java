@@ -74,9 +74,7 @@ public class CacheCore {
 
     public Observable run(Observable observable, final CacheMethod method,Request request,RequestHandler handler,boolean isRealData,Type returnType){
 
-        RequestKey key = new RequestKey(method.getKey());
-
-        request.init2(request,key,null,false,observable,method);
+        request.init2(request,request.getKey(),null,false,observable,method);
 
         request.setReturnType(returnType);
 
