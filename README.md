@@ -158,9 +158,10 @@ if we want to use this api,Firstly,we must to create a retrofit
 ```
 
 ```
+TypeToken type = TypeToken.getParameterized(HttpResult.class,CommonDictResponse.Result.class);
 restApi.getCommonDict()
                         .compose(OkRxCache.with(getApplicationContext())
-                                .<HttpResult<CommonDictResponse.Result>>transformToCache("111111",111))
+                                .<HttpResult<CommonDictResponse.Result>>transformToCache("111111",111,type))
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
                         .subscribe(new Subscriber<CacheResult<HttpResult<CommonDictResponse.Result>>>() {
@@ -210,7 +211,7 @@ OkRxCache.with(this).put("222",list,111)
 ##### get
 
 It must be find by the key and Type
-For example,if we want to put List<Interger> , we can use  TypeToken to create a "List<Interger>" return type.
+For example,if we want to put List \< Interger \> , we can use  TypeToken to create a "List \< Interger \>" return type.
 
 ```
         TypeToken type = TypeToken.getParameterized(ArrayList.class,Integer.class);
