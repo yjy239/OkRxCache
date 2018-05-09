@@ -118,6 +118,14 @@ public class MemoryInterceptor<T> implements Interceptor {
                     //获取活跃的资源是否存在
                     result = mEngine.loadFromActiveResources(request.getKey(),true);
                 }
+
+                if(mCacheStagry == CacheStragry.ONLYMEMORY){
+                    CacheResult empty = new CacheResult<>(null,0,0);;
+                    empty.setFromCache(CacheBack.MEMORY);
+                    subscriber.onNext(result);
+                    subscriber.onCompleted();
+                }
+
                 if(result != null){
                     if(!mCacheStagry.isOutDate() &&result.getLifeTime()+result.getCurrentTime() < System.currentTimeMillis()) {
                         LogUtils.getInstance().e("okrxcache"+request.getKey(),"result is outdate"+result.toString());
