@@ -6,6 +6,7 @@ import android.util.Log;
 import com.yjy.okrxcache_core.Cache.CacheStragry;
 import com.yjy.okrxcache_core.Cache.MemoryCacheCallBack;
 import com.yjy.okrxcache_core.CacheResult;
+import com.yjy.okrxcache_core.Engine.CacheBack;
 import com.yjy.okrxcache_core.Engine.InterceptorMode;
 import com.yjy.okrxcache_core.Request.Request;
 import com.yjy.okrxcache_core.Utils.LogUtils;
@@ -63,7 +64,7 @@ public class MemoryInterceptor<T> implements Interceptor {
                 return Observable.merge(memoryObservale,chain.process().compose(save2CacheResult(request)));
             }else if(mCacheStagry == CacheStragry.FIRSTCACHE){
                 //优先显示缓存，找到了就不找网络
-                return Observable.concat(memoryObservale,chain.process().compose(save2CacheResult(request)));
+                return memoryObservale.switchIfEmpty(chain.process().compose(save2CacheResult(request)));
             }else if(mCacheStagry == CacheStragry.ONLYNETWORK){
                 //只获取网络
                 return chain.process().compose(save2CacheResult(request));
@@ -125,10 +126,9 @@ public class MemoryInterceptor<T> implements Interceptor {
 
                     if(result != null){
                         request.setHadGetCache(true);
-                    }else {
-
                     }
 
+                    result.setFromCache(CacheBack.MEMORY);
                     LogUtils.getInstance().e("okrxcache"+request.getKey(),"load succcess");
                     subscriber.onNext(result);
                 }

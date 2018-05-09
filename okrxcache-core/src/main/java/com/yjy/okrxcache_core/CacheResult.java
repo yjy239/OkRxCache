@@ -2,6 +2,7 @@ package com.yjy.okrxcache_core;
 
 import android.graphics.Bitmap;
 
+import com.yjy.okrxcache_core.Engine.CacheBack;
 import com.yjy.okrxcache_core.Utils.MemorySizeOf;
 import com.yjy.okrxcache_core.Utils.Occupy;
 import com.yjy.okrxcache_core.Utils.Utils;
@@ -20,11 +21,13 @@ import java.io.Serializable;
 
 public class CacheResult<T> implements Serializable{
     private final T mData;
-//    private final CacheStrategy mSource;
     private long mCurrentTime;
     private long mLifeTime;
-    private int mDataSize = 0;
-    private Occupy occupy = new Occupy((byte) 0, (byte)0, (byte)4);;
+    private Occupy occupy = new Occupy((byte) 0, (byte)0, (byte)4);
+    //0:代表网络
+    //1:代表disk
+    //2:代表memory
+    private int mFromCache = 0;
 
     public CacheResult(T data,long currentTime,long lifeTime) {
         this.mData = data;
@@ -43,6 +46,14 @@ public class CacheResult<T> implements Serializable{
         return mData;
     }
 
+    public void setFromCache(int fromCache) {
+        this.mFromCache = fromCache;
+    }
+
+    public String getFromCache() {
+        return fromWhere(mFromCache);
+    }
+
     private int countSize(Object value) {
         if (value == null) {
             return 0;
@@ -59,9 +70,24 @@ public class CacheResult<T> implements Serializable{
     }
 
 
-//    public CacheStrategy getSource() {
-//        return mSource;
-//    }
+    private String fromWhere(int state){
+
+        String cache = "network";
+        switch (state){
+            case CacheBack.NETWORK:
+                cache = "network";
+                break;
+            case CacheBack.DISK:
+                cache = "disk";
+                break;
+            case CacheBack.MEMORY:
+                cache = "memory";
+                break;
+            default:
+                    break;
+        }
+        return cache;
+    }
 
     public long getCurrentTime() {
         return mCurrentTime;
@@ -76,7 +102,8 @@ public class CacheResult<T> implements Serializable{
         return "Reply{" +
                 "data=" + mData +
                 ", lifeTime=" + mLifeTime +
-                ", currentTime"+mCurrentTime+
+                ", currentTime = "+mCurrentTime+
+                ", from " + fromWhere(mFromCache)+
                 '}';
     }
 

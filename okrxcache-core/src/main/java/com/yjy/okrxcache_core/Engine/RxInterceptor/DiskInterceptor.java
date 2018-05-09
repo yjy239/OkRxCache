@@ -10,6 +10,7 @@ import com.yjy.okrxcache_core.Cache.DiskCache.DiskCache;
 import com.yjy.okrxcache_core.Cache.Key.Key;
 import com.yjy.okrxcache_core.CacheResult;
 import com.yjy.okrxcache_core.Convert.IConvert;
+import com.yjy.okrxcache_core.Engine.CacheBack;
 import com.yjy.okrxcache_core.Engine.InterceptorMode;
 import com.yjy.okrxcache_core.Request.Request;
 import com.yjy.okrxcache_core.Utils.LogUtils;
@@ -80,13 +81,10 @@ public class DiskInterceptor<T> implements Interceptor {
         if(mCacheStagry == CacheStragry.ALL){
             //优先缓存显示,之后会显示网络
             //一旦发现request告诉你已经拿到缓存了，没必要再从disk中获取
-//            if(request.isHadGetCache()){
-//                return transFormToCache(chain.process(),request);
-//            }
             return Observable.merge(loadDiskObservable,transFormToCache(chain.process(),request));
         }else if(mCacheStagry == CacheStragry.FIRSTCACHE){
             //优先显示缓存，找到了就不找网络
-            return Observable.concat(loadDiskObservable,transFormToCache(chain.process(),request));
+            return loadDiskObservable.switchIfEmpty(transFormToCache(chain.process(),request));
         }else if(mCacheStagry == CacheStragry.ONLYNETWORK){
             //只获取网络
             return transFormToCache(chain.process(),request);
@@ -95,7 +93,7 @@ public class DiskInterceptor<T> implements Interceptor {
         }else if(mCacheStagry == CacheStragry.NOMEMORY){
             return Observable.merge(loadDiskObservable,transFormToCache(chain.process(),request));
         }else if(mCacheStagry == CacheStragry.NODISK){
-            return chain.process();
+            return transFormToCache(chain.process(),request);
         }
 
 
@@ -129,7 +127,7 @@ public class DiskInterceptor<T> implements Interceptor {
             public void call(Subscriber<? super Object> subscriber) {
                 if(!request.isHadGetCache()){
                     CacheResult result = loadFromDisk(request.getKey(),request.getReturnType());
-
+                    result.setFromCache(CacheBack.DISK);
                     if(result == null){
                         CacheResult empty = new CacheResult(null,0,0);
                         if(mMode == InterceptorMode.GET){
@@ -169,10 +167,10 @@ public class DiskInterceptor<T> implements Interceptor {
                         }
                         result = new CacheResult(t,System.currentTimeMillis(),
                                 request.getMethod().getLifeTime());
+                        result.setFromCache(CacheBack.NETWORK);
                         request.setResult(result);
                         save2DiskCache(request.getKey(),result);
                         LogUtils.getInstance().e("okrxcache :"+request.getKey()," DiskInterceptor: save2DiskCache : "+true);
-
                         return result;
                     }
                 });

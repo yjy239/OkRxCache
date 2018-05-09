@@ -45,36 +45,6 @@ public class NetWorkInterceptor<T> implements Interceptor {
         }
 
         return mHandler.load(chain);
-
-//        Log.e("NetWorkInterceptor","NetWorkInterceptor");
-//        return  chain.request().getObservable().map(new Func1<Response<ResponseBody>, T>() {
-//            @Override
-//            public T call(Response<ResponseBody> responseBodyResponse)  {
-//                //可能需要处理无法用gosn转化的对象
-//
-//                if(chain.request().getMethod().isNetContronller()){
-//                    Log.e("header",responseBodyResponse.headers()+"");
-//                    chain.request().setNetTime(true);
-//                }
-//                Gson gson = new Gson();
-//                JsonReader jsonReader = gson.newJsonReader(responseBodyResponse.body().charStream());
-//                TypeAdapter adapter = gson.getAdapter(TypeToken.get(chain.request()
-//                        .getReturnType()));
-//                T o = null;
-//                try {
-//                    o = (T)adapter.read(jsonReader);
-////                    Log.e("type",""+o.getClass());
-//                }catch (Exception e){
-//                    e.printStackTrace();
-//                }
-//                return o;
-//            }
-//        }).onErrorReturn(new Func1() {
-//            @Override
-//            public Object call(Object o) {
-//                return "error";
-//            }
-//        });
     }
 
     @Override

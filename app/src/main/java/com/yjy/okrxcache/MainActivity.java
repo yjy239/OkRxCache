@@ -137,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
 
                 restApi.getCommonDict()
                         .compose(OkRxCache.with(getApplicationContext())
+                                .setStragry(CacheStragry.ONLYNETWORK)
                                 .isDebug(true)
                                 .<HttpResult<CommonDictResponse.Result>>transformToCache("111111",111,token.getType()))
                         .subscribeOn(Schedulers.io())
@@ -154,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
 
                             @Override
                             public void onNext(CacheResult<HttpResult<CommonDictResponse.Result>> httpResultCacheResult) {
-                                Log.e("request",httpResultCacheResult.getData().toString());
+                                Log.e("request",httpResultCacheResult.getData().toString()+" "+httpResultCacheResult.getFromCache());
                             }
                         });
             }
