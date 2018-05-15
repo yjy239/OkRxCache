@@ -127,13 +127,13 @@ public class DiskInterceptor<T> implements Interceptor {
             public void call(Subscriber<? super Object> subscriber) {
                 if(!request.isHadGetCache()){
                     CacheResult result = loadFromDisk(request.getKey(),request.getReturnType());
-                    result.setFromCache(CacheBack.DISK);
                     if(result == null){
                         CacheResult empty = new CacheResult(null,0,0);
                         if(mMode == InterceptorMode.GET){
                             subscriber.onNext(empty);
                         }
                     }else {
+                        result.setFromCache(CacheBack.DISK);
                         LogUtils.getInstance().e("okrxcache :"+request.getKey()," DiskInterceptor: loadFromDiskCache"+result.toString());
                         subscriber.onNext(result);
                     }
@@ -162,9 +162,6 @@ public class DiskInterceptor<T> implements Interceptor {
 //                        Log.e("DiskInterceptor","transformeToCacheResult");
                         CacheResult result = null;
                         request.setResult(result);
-                        if(t instanceof  String &&((String)t).equals("error")){
-                            return result;
-                        }
                         result = new CacheResult(t,System.currentTimeMillis(),
                                 request.getMethod().getLifeTime());
                         result.setFromCache(CacheBack.NETWORK);

@@ -10,6 +10,8 @@ import com.yjy.okrxcache_core.Convert.IConvert;
 import com.yjy.okrxcache_core.Engine.CacheEngine;
 import com.yjy.okrxcache_core.Engine.InterceptorMode;
 
+import okhttp3.OkHttpClient;
+
 /**
  * <pre>
  *     author : yjy
@@ -31,6 +33,7 @@ public class OkRxCache {
     private IConvert mConvert;
     private DiskCache.Factory mDiskCacheFactory;
     private CacheEngine mEngine;
+    private OkHttpClient mClient;
 
 
     synchronized static OkRxCache get(Context context){
@@ -84,13 +87,14 @@ public class OkRxCache {
 
 
 
-    public OkRxCache(CacheCore core,CacheEngine mEngine,DiskCache.Factory diskFactory,MemoryCache cache
+    public OkRxCache(CacheCore core,OkHttpClient client,CacheEngine mEngine,DiskCache.Factory diskFactory,MemoryCache cache
             ,IConvert convert){
         this.mDiskCacheFactory = diskFactory;
         this.mMemoryCache = cache;
         this.mConvert = convert;
         this.mCore = core;
         this.mEngine = mEngine;
+        this.mClient = client;
     }
 
     CacheCore getCore(){
@@ -99,6 +103,10 @@ public class OkRxCache {
 
     CacheEngine getEngine(){
         return mEngine;
+    }
+
+    OkHttpClient getClient(){
+        return mClient;
     }
 
 

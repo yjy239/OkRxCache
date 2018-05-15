@@ -1,5 +1,6 @@
 package com.yjy.okrxcache;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         Button btn = (Button)findViewById(R.id.request);
         Button remove = (Button)findViewById(R.id.remove);
         Button clear = (Button)findViewById(R.id.clear);
+        Button web = (Button)findViewById(R.id.web);
 
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -208,6 +210,14 @@ public class MainActivity extends AppCompatActivity {
                                 Log.e("clear",aBoolean.toString());
                             }
                         });
+            }
+        });
+
+        web.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this,WebActivity.class);
+                startActivity(i);
             }
         });
 

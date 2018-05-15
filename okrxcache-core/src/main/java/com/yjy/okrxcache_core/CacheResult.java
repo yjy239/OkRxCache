@@ -21,8 +21,8 @@ import java.io.Serializable;
 
 public class CacheResult<T> implements Serializable{
     private final T mData;
-    private long mCurrentTime;
-    private long mLifeTime;
+    private long mCurrentTime = 0;
+    private long mLifeTime = 0;
     private Occupy occupy = new Occupy((byte) 0, (byte)0, (byte)4);
     //0:代表网络
     //1:代表disk

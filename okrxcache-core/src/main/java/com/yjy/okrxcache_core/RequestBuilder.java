@@ -19,6 +19,8 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Response;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -44,12 +46,14 @@ public class RequestBuilder {
     private boolean isForce = true;
     private OkRxCache mOkRxCache;
     private boolean isDebug = false;
+    private OkHttpClient mClient;
 
 
     public RequestBuilder(Context context){
         this.mContext = context;
         mOkRxCache =  OkRxCache.get(context);
         mCore = mOkRxCache.getCore();
+        this.mClient = mOkRxCache.getClient();
     }
 
     public RequestBuilder(OkRxCache okRxCache){
@@ -184,6 +188,24 @@ public class RequestBuilder {
             }
         };
     }
+
+
+    public Observable<CacheResult> request(String url,Type type){
+        okhttp3.Request request = new okhttp3.Request.Builder()
+                .url(url)
+                .addHeader("User-Agent",
+                "Android")
+                .build();
+
+
+        return request(request,type);
+    }
+
+    public Observable<CacheResult> request(okhttp3.Request request,Type type){
+
+        return mCore.request(Observable.just(request),mClient,request,build(),type);
+    }
+
 
 
     /**

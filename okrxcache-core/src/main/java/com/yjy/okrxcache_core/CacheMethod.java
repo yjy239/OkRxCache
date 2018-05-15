@@ -37,8 +37,8 @@ import retrofit2.http.PUT;
  */
 
 public class CacheMethod {
-    private long mLifeTime;
-    private boolean mFromNet;
+    private long mLifeTime = 0;
+    private boolean mFromNet = false;
     private Method mMethod;
     static final String PARAM = "[a-zA-Z][a-zA-Z0-9_-]*";
     static final Pattern PARAM_URL_REGEX = Pattern.compile("\\{(" + PARAM + ")\\}");

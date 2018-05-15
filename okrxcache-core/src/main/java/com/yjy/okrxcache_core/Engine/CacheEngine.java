@@ -13,6 +13,7 @@ import com.yjy.okrxcache_core.Cache.MemoryCache.MemoryCache;
 import com.yjy.okrxcache_core.Cache.MemoryCacheCallBack;
 import com.yjy.okrxcache_core.CacheResult;
 import com.yjy.okrxcache_core.Convert.IConvert;
+import com.yjy.okrxcache_core.Engine.RequestHandler.OkHttpNetWorkHandler;
 import com.yjy.okrxcache_core.Engine.RequestHandler.RequestHandler;
 import com.yjy.okrxcache_core.Engine.RxInterceptor.DiskInterceptor;
 import com.yjy.okrxcache_core.Engine.RxInterceptor.Interceptor;
@@ -30,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.OkHttpClient;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -307,7 +309,13 @@ public class CacheEngine<T> implements MemoryCacheCallBack{
         runInit(request,null);
         RealInterceptorChain chain = new RealInterceptorChain(mInterceptors,0,request,mode);
         return chain.process();
+    }
 
+    public Observable request(Request request, OkHttpClient client){
+        OkHttpNetWorkHandler handler = new OkHttpNetWorkHandler(client);
+        runInit(request,handler);
+        RealInterceptorChain chain = new RealInterceptorChain(mInterceptors,0,request,InterceptorMode.RUN);
+        return chain.process();
     }
 
     /**
@@ -383,7 +391,7 @@ public class CacheEngine<T> implements MemoryCacheCallBack{
                             Map.Entry<Map<Key, WeakReference<CacheResult<?>>>,ReferenceQueue<CacheResult<?>>> item = entry.next();
                             MessageQueue queue = Looper.myQueue();
                             queue.addIdleHandler(new RefQueueIdleHandler(item.getKey(), item.getValue()));
-                            Log.e(TAG,"PUT");
+//                            Log.e(TAG,"PUT");
                         }
                     }
 

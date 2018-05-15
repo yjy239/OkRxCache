@@ -14,6 +14,8 @@ import com.yjy.okrxcache_core.Engine.RxInterceptor.Interceptor;
 
 import java.util.ArrayList;
 
+import okhttp3.OkHttpClient;
+
 /**
  * <pre>
  *     author : yjy
@@ -37,6 +39,7 @@ class RxCacheBuilder {
     private CacheStragry mCacheStagry;
     private boolean isForce = true;
     private MemoryCache mMemoryCache;
+    private OkHttpClient mClient;
     private static final int DEFAULT_MEMORY_CACHE_SIZE = (int) (Runtime.getRuntime().maxMemory() / 8);//运行内存的8分之1
 
 
@@ -67,8 +70,11 @@ class RxCacheBuilder {
 
         CacheEngine engine = new CacheEngine(mDiskcache,mMemoryCache,mConvert,mCacheStagry);
         mCore = new CacheCore(engine);
+        mClient = new OkHttpClient();
 
-        return new OkRxCache(mCore,engine,mDiskCacheFactory,mMemoryCache,mConvert);
+
+
+        return new OkRxCache(mCore,mClient,engine,mDiskCacheFactory,mMemoryCache,mConvert);
     }
 
 

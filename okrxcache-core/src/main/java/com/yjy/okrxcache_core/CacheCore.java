@@ -17,6 +17,7 @@ import com.yjy.okrxcache_core.Request.Request;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
+import okhttp3.OkHttpClient;
 import rx.Observable;
 
 import com.yjy.okrxcache_core.Engine.RxInterceptor.Interceptor;
@@ -94,6 +95,19 @@ public class CacheCore {
 
         return mEngine.operator(request, mode);
     }
+
+    public Observable request(Observable observable, OkHttpClient client ,okhttp3.Request okRequest, Request request, Type type){
+
+        RequestKey key = new RequestKey(okRequest.url().toString());
+        CacheMethod method = new CacheMethod.Builder(null,null,null).build();
+        request.init2(request,key,null,false,observable,method);
+
+        request.setReturnType(type);
+
+        return mEngine.request(request,client);
+
+    }
+
 
 
 
