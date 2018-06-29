@@ -113,7 +113,7 @@ public class DiskInterceptor<T> implements Interceptor {
      * @return
      */
     private <T>Observable transFormToCache(Observable observable,Request request){
-        return observable.compose(this.<T>transformeToCacheResult(request));
+        return observable.compose(this.<T>transformToCacheResult(request));
     }
 
     /**
@@ -151,7 +151,7 @@ public class DiskInterceptor<T> implements Interceptor {
      * @param <T>
      * @return
      */
-    private <T>Observable.Transformer<T,CacheResult<T>> transformeToCacheResult(final Request request){
+    private <T>Observable.Transformer<T,CacheResult<T>> transformToCacheResult(final Request request){
         return new Observable.Transformer<T, CacheResult<T>>() {
             @Override
             public Observable<CacheResult<T>> call(Observable<T> tObservable) {

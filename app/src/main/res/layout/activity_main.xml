@@ -33,4 +33,11 @@
         android:layout_below="@+id/clear"
         android:text="to web"/>
 
+    <Button
+        android:id="@+id/retry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/web"
+        android:text="retry"/>
+
 </RelativeLayout>

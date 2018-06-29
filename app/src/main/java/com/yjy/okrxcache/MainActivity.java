@@ -1,6 +1,7 @@
 package com.yjy.okrxcache;
 
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,12 +9,19 @@ import android.view.View;
 import android.widget.Button;
 
 import com.google.gson.reflect.TypeToken;
+import com.jakewharton.rxbinding.view.RxView;
 import com.yjy.okrxcache.test.ApiService;
+import com.yjy.okrxcache.test.ReUseConnectableObservable;
 import com.yjy.okrxcache_core.Cache.CacheStragry;
 import com.yjy.okrxcache_core.CacheResult;
 import com.yjy.okrxcache_core.OkRxCache;
 
 import java.util.ArrayList;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicReference;
 
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -21,6 +29,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
+import rx.Subscription;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.functions.Func2;
+import rx.observables.ConnectableObservable;
+import rx.plugins.RxJavaHooks;
+import rx.plugins.RxJavaPlugins;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         Button remove = (Button)findViewById(R.id.remove);
         Button clear = (Button)findViewById(R.id.clear);
         Button web = (Button)findViewById(R.id.web);
+        Button retry = (Button)findViewById(R.id.retry);
 
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -52,28 +68,6 @@ public class MainActivity extends AppCompatActivity {
                 .setStragry(CacheStragry.ALL)
                 .using(ApiService.class)
                 .createOrgin(restApi);
-
-
-
-        restApi.getCommonDict()
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe(new Observer<HttpResult<CommonDictResponse.Result>>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(HttpResult<CommonDictResponse.Result> resultHttpResult) {
-                        Log.e("result",resultHttpResult.toString());
-                    }
-                });
 
         ArrayList<Integer> list = new ArrayList();
         list.add(0);
@@ -128,8 +122,6 @@ public class MainActivity extends AppCompatActivity {
 
 //        final Observable.Transformer transformer = OkRxCache.with(this)
 //                .transformToCache("111111",111);
-
-
 
 
         btn.setOnClickListener(new View.OnClickListener() {
@@ -220,6 +212,112 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+
+        //test for retry
+
+        final Observable<HttpResult<CommonDictResponse.Result>> net = restApi.getCommonDict().subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io());
+
+
+        final Subscriber subscriber = new Subscriber<HttpResult<CommonDictResponse.Result>>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(HttpResult<CommonDictResponse.Result> resultHttpResult) {
+                Log.e("result",resultHttpResult.data.accountUrl);
+            }
+        };
+
+        final ReUseSubscriber reUseSubscriber = new ReUseSubscriber(subscriber);
+
+
+
+
+
+
+
+        final RxManager manager = new RxManager();
+        Observable.create(new Observable.OnSubscribe<Object>() {
+            @Override
+            public void call(Subscriber<? super Object> subscriber) {
+
+            }
+        }).subscribe(new Subscriber<Object>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Object o) {
+
+            }
+        });
+
+
+
+        retry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                net.subscribe(reUseSubscriber);
+
+//                manager.addSubscription(restApi.getCommonDict(), new Subscriber<HttpResult<CommonDictResponse.Result>>() {
+//                    @Override
+//                    public void onCompleted() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onNext(HttpResult<CommonDictResponse.Result> resultHttpResult) {
+//                        Log.e("manager",resultHttpResult.data.accountUrl);
+//                    }
+//                });
+
+            }
+        });
+
+
+
+//        restApi.getCommonDict().subscribeOn(Schedulers.io())
+//                .observeOn(Schedulers.io())
+//                .subscribe(new Observer<HttpResult<CommonDictResponse.Result>>() {
+//                    @Override
+//                    public void onCompleted() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onNext(HttpResult<CommonDictResponse.Result> resultHttpResult) {
+//                        Log.e("result",resultHttpResult.data.accountUrl);
+//                    }
+//                });
+
+
+
 
 
 

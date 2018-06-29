@@ -34,6 +34,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
     implementation 'com.orhanobut:logger:2.1.1'
+    compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
 
     annotationProcessor project(':okrxcache-compiler')
     implementation project(':okrxcache-base')
