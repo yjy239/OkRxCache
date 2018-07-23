@@ -233,6 +233,16 @@ public class RequestBuilder {
         return mCore.operator(orgin,key, InterceptorMode.SAVE,request,null);
     }
 
+    /**
+     * 将结果通过key保存在disk
+     * @param key
+     * @param data
+     * @return
+     */
+    public  <T>Observable<Boolean> put(String key, T data,long lifetime,Type type){
+        return put(key,data,lifetime,type);
+    }
+
 
     /**
      * 清空缓存

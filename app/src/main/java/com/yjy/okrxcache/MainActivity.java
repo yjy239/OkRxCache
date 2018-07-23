@@ -1,41 +1,34 @@
 package com.yjy.okrxcache;
 
 import android.content.Intent;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.jakewharton.rxbinding.view.RxView;
+import com.yjy.okrxcache.test.A;
 import com.yjy.okrxcache.test.ApiService;
-import com.yjy.okrxcache.test.ReUseConnectableObservable;
+import com.yjy.okrxcache.test.B;
+import com.yjy.okrxcache.test.FTest;
+import com.yjy.okrxcache.test.ITest;
+import com.yjy.okrxcache.test.InterfaceGsonConvert;
+import com.yjy.okrxcache.test.STest;
+import com.yjy.okrxcache.test.TestTypeAdapter;
 import com.yjy.okrxcache_core.Cache.CacheStragry;
 import com.yjy.okrxcache_core.CacheResult;
 import com.yjy.okrxcache_core.OkRxCache;
 
 import java.util.ArrayList;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.atomic.AtomicReference;
 
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
-import rx.Observer;
 import rx.Subscriber;
-import rx.Subscription;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.functions.Func2;
-import rx.observables.ConnectableObservable;
-import rx.plugins.RxJavaHooks;
-import rx.plugins.RxJavaPlugins;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
@@ -49,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
         Button clear = (Button)findViewById(R.id.clear);
         Button web = (Button)findViewById(R.id.web);
         Button retry = (Button)findViewById(R.id.retry);
+        Button get = findViewById(R.id.get);
+        Button put = findViewById(R.id.put);
 
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -73,52 +68,137 @@ public class MainActivity extends AppCompatActivity {
         list.add(0);
         list.add(1);
 
-        OkRxCache cache = OkRxCache.init(this);
-
-        cache.with()
-                .isDebug(true).put("222",list,111)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe(new Subscriber<Boolean>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(Boolean aBoolean) {
-                        Log.e("put",aBoolean.toString());
-                    }
-                });
-
-        TypeToken type = TypeToken.getParameterized(ArrayList.class,Integer.class);
+        final FutureTest f = new FutureTest();
+        final OkRxCache cache = OkRxCache.init(this);
 
 
-        OkRxCache.with(this)
-                .get("222",type.getType())
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe(new Subscriber<CacheResult>() {
-                    @Override
-                    public void onCompleted() {
+        Gson gson = new GsonBuilder()
+                .registerTypeHierarchyAdapter(ITest.class, new TestTypeAdapter())
+                .create();
 
-                    }
+        A a = new A(1,2);
+        FTest t = new FTest();
+        t.setData(a);
+        String s = gson.toJson(t);
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("get",e.toString());
-                    }
+        Log.e("FTest",s);
 
-                    @Override
-                    public void onNext(CacheResult cacheResult) {
-                        Log.e("get",cacheResult.getData()+"");
-                    }
-                });
+        ITest test =  gson.fromJson(s,FTest.class);
+
+        Log.e("itest",test.toString());
+
+
+        put.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList<ITest> tests = new ArrayList<>();
+                FTest t1 = new FTest();
+                t1.setData(new A(1,2));
+                STest t2 = new STest();
+                t2.setData(new B(2));
+                tests.add(t1);
+                tests.add(t2);
+
+                cache.with()
+                        .setStragry(CacheStragry.ONLYDISK)
+                        .isDebug(true).setConvert(new InterfaceGsonConvert()).put("333",tests,0)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io())
+                        .subscribe(new Subscriber<Boolean>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onNext(Boolean aBoolean) {
+                                Log.e("put",aBoolean.toString());
+                                f.setReady(true);
+                            }
+                        });
+
+            }
+        });
+
+
+
+        final TypeToken type = TypeToken.getParameterized(ArrayList.class,ITest.class);
+
+        get.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cache.with()
+                        .isDebug(true)
+                        .setConvert(new InterfaceGsonConvert())
+                        .setStragry(CacheStragry.ONLYDISK)
+                        .get("333",type.getType())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io())
+                        .subscribe(new Subscriber<CacheResult>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Log.e("get",e.toString());
+                            }
+                            @Override
+                            public void onNext(CacheResult cacheResult) {
+                                ArrayList<ITest> tests = (ArrayList<ITest>)cacheResult.getData();
+                                for(int i=0;i<tests.size();i++){
+
+                                    Log.e("get",tests.get(i).getData().getClass().getName()+"");
+                                }
+
+                            }
+                        });
+
+
+            }
+        });
+
+
+
+//        Observable.fromCallable(f)
+//                .flatMap(new Func1<Boolean, Observable<CacheResult>>() {
+//                    @Override
+//                    public Observable<CacheResult> call(Boolean aBoolean) {
+//                        return OkRxCache.with(MainActivity.this)
+//                                .get("333",type.getType());
+//                    }
+//                })
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(Schedulers.io())
+//                .subscribe(new Subscriber<CacheResult>() {
+//                    @Override
+//                    public void onCompleted() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.e("get",e.toString());
+//                    }
+//
+//                    @Override
+//                    public void onNext(CacheResult cacheResult) {
+//                        ArrayList<ITest> tests = (ArrayList<ITest>)cacheResult.getData();
+//                        for(int i=0;i<tests.size();i++){
+//
+//                            Log.e("get",tests.get(i).getData()+"");
+//                        }
+//
+//                    }
+//                });
+
+
 
 //        final Observable.Transformer transformer = OkRxCache.with(this)
 //                .transformToCache("111111",111);

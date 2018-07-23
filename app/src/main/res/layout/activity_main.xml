@@ -40,4 +40,18 @@
         android:layout_below="@+id/web"
         android:text="retry"/>
 
+    <Button
+        android:id="@+id/get"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/retry"
+        android:text="get"/>
+
+    <Button
+        android:id="@+id/put"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/get"
+        android:text="put"/>
+
 </RelativeLayout>
