@@ -8,11 +8,11 @@ import com.yjy.okrxcache_core.Engine.RxInterceptor.Interceptor;
 
 import java.io.IOException;
 
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import rx.Observable;
-import rx.functions.Func1;
 
 /**
  * <pre>
@@ -34,9 +34,9 @@ public class OkHttpNetWorkHandler implements RequestHandler {
 
     @Override
     public <T> Observable load(final Interceptor.Chain chain){
-        return chain.request().getObservable().map(new Func1<Request, Response>() {
+        return chain.request().getObservable().map(new Function<Request, Response>() {
             @Override
-            public Response call(Request request) {
+            public Response apply(Request request) throws Exception {
                 if(mClient == null){
                     return new Response.Builder().build();
                 }
@@ -49,9 +49,9 @@ public class OkHttpNetWorkHandler implements RequestHandler {
                 }
                 return response;
             }
-        }).map(new Func1<Response,T>() {
+        }).map(new Function<Response,T>() {
             @Override
-            public T call(Response response) {
+            public T apply(Response response) {
                 if(chain.request().getReturnType() == null ){
                     T result = null;
                     try {

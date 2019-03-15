@@ -1,7 +1,5 @@
 package com.yjy.okrxcache_core.Engine.RequestHandler;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
@@ -9,11 +7,11 @@ import com.google.gson.stream.JsonReader;
 import com.yjy.okrxcache_core.Engine.RxInterceptor.Interceptor;
 import com.yjy.okrxcache_core.Utils.LogUtils;
 
-
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
-import rx.Observable;
-import rx.functions.Func1;
+
 
 /**
  * <pre>
@@ -29,9 +27,9 @@ public class ProxyNetWorkHandler<T> implements RequestHandler{
 
     @Override
     public <T> Observable load(final Interceptor.Chain chain) {
-        return  chain.request().getObservable().map(new Func1<Response<ResponseBody>, T>() {
+        return  chain.request().getObservable().map(new Function<Response<ResponseBody>, T>() {
             @Override
-            public T call(Response<ResponseBody> responseBodyResponse)  {
+            public T apply(Response<ResponseBody> responseBodyResponse)  {
                 //可能需要处理无法用gosn转化的对象
 
                 if(chain.request().getMethod().isNetContronller()){

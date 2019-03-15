@@ -129,7 +129,7 @@ public class RxCacheProcessor extends AbstractProcessor{
                     JCTree.JCMethodDecl method = (JCTree.JCMethodDecl) jcTree;
 //                    System.out.println(method);
 //                    System.out.println(method.restype);
-                    JCTree.JCExpression observerExp = make.Select(make.Ident(names.fromString("rx")),names.fromString("Observable"));
+                    JCTree.JCExpression observerExp = make.Select(make.Ident(names.fromString("io.reactivex")),names.fromString("Observable"));
 //                    System.out.println(" id "+observerExp);
                     //retrofit2.Response
                     JCTree.JCExpression ResponseExp = make.Select(make.Ident(names.fromString("retrofit2")),names.fromString("Response"));

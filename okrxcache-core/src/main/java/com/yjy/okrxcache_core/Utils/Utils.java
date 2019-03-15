@@ -7,11 +7,12 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 import retrofit2.Response;
-import retrofit2.adapter.rxjava.Result;
-import rx.Completable;
-import rx.Observable;
-import rx.Single;
+import retrofit2.adapter.rxjava2.Result;
+
 
 import static com.google.gson.internal.$Gson$Types.getRawType;
 

@@ -11,7 +11,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 /**
  * <pre>

@@ -1,22 +1,20 @@
 package com.yjy.okrxcache.test;
 
 
-
-
-import com.yjy.okrxcache_base.AutoCache;
-import com.yjy.okrxcache_base.LifeCache;
 import com.yjy.okrxcache.CommonDictResponse;
 import com.yjy.okrxcache.HttpResult;
+import com.yjy.okrxcache_base.AutoCache;
+import com.yjy.okrxcache_base.LifeCache;
 
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
-import rx.Observable;
 
 /**
  * <pre>
@@ -35,7 +33,7 @@ public interface ApiService {
     Observable<Integer> getHouseListByBuilding(@Path("building_code") String projectCode);
 
     String URL_BASE = "https://api.github.com";
-    String HEADER_API_VERSION = "Accept: application/vnd.github.v3+json";
+    String HEADER_API_VERSION = "Accept:application/vnd.github.v3+json";
 
 
     @Headers({HEADER_API_VERSION,"aaaaaa"})

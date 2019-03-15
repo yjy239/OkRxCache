@@ -1,8 +1,6 @@
 package com.yjy.okrxcache_core.Engine.RxInterceptor;
 
 
-import android.util.Log;
-
 import com.yjy.okrxcache_core.Cache.CacheStragry;
 import com.yjy.okrxcache_core.Cache.MemoryCacheCallBack;
 import com.yjy.okrxcache_core.CacheResult;
@@ -11,9 +9,13 @@ import com.yjy.okrxcache_core.Engine.InterceptorMode;
 import com.yjy.okrxcache_core.Request.Request;
 import com.yjy.okrxcache_core.Utils.LogUtils;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.functions.Func1;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
+import io.reactivex.ObservableTransformer;
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
+
 
 /**
  * <pre>
@@ -97,9 +99,9 @@ public class MemoryInterceptor<T> implements Interceptor {
      * @return
      */
     private Observable getRealData(Observable observable){
-        return observable.map(new Func1<CacheResult<T>, T>() {
+        return observable.map(new Function<CacheResult<T>, T>() {
             @Override
-            public T call(CacheResult<T> tCacheResult) {
+            public T apply(CacheResult<T> tCacheResult) {
                 return tCacheResult.getData();
             }
         });
@@ -111,9 +113,9 @@ public class MemoryInterceptor<T> implements Interceptor {
      * @return
      */
     private Observable loadFromMemoryCache(final Request request){
-        return Observable.create(new Observable.OnSubscribe<Object>() {
+        return Observable.create(new ObservableOnSubscribe<Object>() {
             @Override
-            public void call(Subscriber<? super Object> subscriber) {
+            public void subscribe(ObservableEmitter<Object> subscriber) throws Exception {
                 CacheResult result =null;
                 //判断缓存是否存在
                 result = mEngine.loadFromCache(request.getKey(),true);
@@ -128,7 +130,7 @@ public class MemoryInterceptor<T> implements Interceptor {
                     CacheResult empty = new CacheResult<>(null,0,0);;
                     empty.setFromCache(CacheBack.MEMORY);
                     subscriber.onNext(result);
-                    subscriber.onCompleted();
+                    subscriber.onComplete();
                 }
 
                 if(result != null){
@@ -146,10 +148,9 @@ public class MemoryInterceptor<T> implements Interceptor {
                     subscriber.onNext(result);
                 }
 
-                subscriber.onCompleted();
-
-
+                subscriber.onComplete();
             }
+
         });
     }
 
@@ -158,14 +159,14 @@ public class MemoryInterceptor<T> implements Interceptor {
      * @param request
      * @return
      */
-    private Observable.Transformer<Boolean,Boolean> isSucessSaveFromDisk(final Request request){
-        return new Observable.Transformer<Boolean, Boolean>() {
+    private ObservableTransformer<Boolean,Boolean> isSucessSaveFromDisk(final Request request){
+        return new ObservableTransformer<Boolean, Boolean>() {
             @Override
-            public Observable<Boolean> call(Observable<Boolean> observable) {
+            public ObservableSource<Boolean> apply(Observable<Boolean> observable) {
 
-                return observable.map(new Func1<Boolean, Boolean>() {
+                return observable.map(new Function<Boolean, Boolean>() {
                     @Override
-                    public Boolean call(Boolean aBoolean) {
+                    public Boolean apply(Boolean aBoolean) {
                         if(!aBoolean){
                             LogUtils.getInstance().e("okrxcache"+request.getKey(),"Disk save failed");
                         }
@@ -183,14 +184,14 @@ public class MemoryInterceptor<T> implements Interceptor {
      * @param <T>
      * @return
      */
-    private <T>Observable.Transformer<T,CacheResult<T>> save2CacheResult(final Request request){
-        return new Observable.Transformer<T, CacheResult<T>>() {
+    private <T>ObservableTransformer<T,CacheResult<T>> save2CacheResult(final Request request){
+        return new ObservableTransformer<T, CacheResult<T>>() {
             @Override
-            public Observable<CacheResult<T>> call(Observable<T> tObservable) {
+            public ObservableSource<CacheResult<T>> apply(Observable<T> tObservable) {
 
-                return tObservable.map(new Func1<T, CacheResult<T>>() {
+                return tObservable.map(new Function<T, CacheResult<T>>() {
                     @Override
-                    public CacheResult<T> call(T t) {
+                    public CacheResult<T> apply(T t) {
                         LogUtils.getInstance().e("okrxcache"+request.getKey(),"save2CacheResult");
                         if(t ==null){
                             throw new IllegalArgumentException(" network error");
@@ -212,14 +213,14 @@ public class MemoryInterceptor<T> implements Interceptor {
      * @param <T>
      * @return
      */
-    private <T>Observable.Transformer<T,Boolean> clearCacheIsSuccess(){
-        return new Observable.Transformer<T, Boolean>() {
+    private <T>ObservableTransformer<T,Boolean> clearCacheIsSuccess(){
+        return new ObservableTransformer<T, Boolean>() {
             @Override
-            public Observable<Boolean> call(Observable<T> tObservable) {
+            public Observable<Boolean> apply(Observable<T> tObservable) {
 
-                return tObservable.map(new Func1<T, Boolean>() {
+                return tObservable.map(new Function<T, Boolean>() {
                     @Override
-                    public Boolean call(T t) {
+                    public Boolean apply(T t) {
                         LogUtils.getInstance().e("MemoryInterceptor","clearCacheIsSuccess");
                         return mEngine.clear();
                     }
@@ -234,14 +235,14 @@ public class MemoryInterceptor<T> implements Interceptor {
      * @param <T>
      * @return
      */
-    private <T>Observable.Transformer<T,Boolean> deleteResultIsSuccess(final Request request){
-        return new Observable.Transformer<T, Boolean>() {
+    private <T>ObservableTransformer<T,Boolean> deleteResultIsSuccess(final Request request){
+        return new ObservableTransformer<T, Boolean>() {
             @Override
-            public Observable<Boolean> call(Observable<T> tObservable) {
+            public Observable<Boolean> apply(Observable<T> tObservable) {
 
-                return tObservable.map(new Func1<T, Boolean>() {
+                return tObservable.map(new Function<T, Boolean>() {
                     @Override
-                    public Boolean call(T t) {
+                    public Boolean apply(T t) {
                         LogUtils.getInstance().e("okrxcache"+request.getKey(),"deleteResultIsSuccess");
                         return mEngine.remove(request.getKey());
                     }
