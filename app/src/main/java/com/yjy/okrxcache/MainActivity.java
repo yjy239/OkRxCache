@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
                 tests.add(t1);
                 tests.add(t2);
 
-                cache.with()
+                OkRxCache.with()
                         .setStragry(CacheStragry.ONLYDISK)
                         .isDebug(true).setConvert(new InterfaceGsonConvert()).put("333",tests,0)
                         .subscribeOn(Schedulers.io())
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         get.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cache.with()
+                OkRxCache.with()
                         .isDebug(true)
                         .setConvert(new InterfaceGsonConvert())
                         .setStragry(CacheStragry.ONLYDISK)

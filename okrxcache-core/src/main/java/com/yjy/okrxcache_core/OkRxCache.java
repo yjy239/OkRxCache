@@ -64,7 +64,7 @@ public class OkRxCache {
      * 全局初始化之后的with
      * @return
      */
-    public  RequestBuilder with(){
+    public static   RequestBuilder with(){
         if(sOkRxcache == null){
             throw new NullPointerException("the Instance of okrxcache is null,please use init() to init it");
         }
