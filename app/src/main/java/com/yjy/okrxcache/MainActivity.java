@@ -151,6 +151,10 @@ public class MainActivity extends AppCompatActivity {
                             }
                             @Override
                             public void onNext(CacheResult cacheResult) {
+                                if(cacheResult.getData() == null){
+                                    Log.e("get","empty");
+                                    return;
+                                }
                                 ArrayList<ITest> tests = (ArrayList<ITest>)cacheResult.getData();
                                 for(int i=0;i<tests.size();i++){
 
