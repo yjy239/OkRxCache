@@ -7,6 +7,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 
+
 /**
  * <pre>
  *     author : yjy
@@ -49,14 +50,15 @@ public class RealInterceptorChain<T> implements Interceptor.Chain {
         }
         RealInterceptorChain next = new RealInterceptorChain(mInterceptors,mIndex+1,mRequest,mMode);
         Interceptor interceptor = mInterceptors.get(mIndex);
-        interceptor.setMode(mMode);
-        try {
-            mObservale = interceptor.intercept(next);
-        }catch (Exception e){
-            mObservale = Observable.empty();
-            e.printStackTrace();
+        if(interceptor != null){
+            interceptor.setMode(mMode);
+            try {
+                mObservale = interceptor.intercept(next);
+            }catch (Exception e){
+                mObservale = Observable.empty();
+                e.printStackTrace();
+            }
         }
-
         return mObservale;
     }
 }

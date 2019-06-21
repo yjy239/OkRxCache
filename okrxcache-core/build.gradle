@@ -40,4 +40,5 @@ dependencies {
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
     implementation project(':okrxcache-base')
     annotationProcessor project(':okrxcache-compiler')
+    implementation "io.reactivex.rxjava2:rxjava:2.2.7"
 }
