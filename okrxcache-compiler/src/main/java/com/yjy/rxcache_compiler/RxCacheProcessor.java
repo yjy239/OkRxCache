@@ -28,6 +28,8 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 
+import static com.yjy.rxcache_compiler.ConstantValue.ANNOTATION_TYPE_AUTOCACHE;
+
 /**
  * <pre>
  *     author : yjy
@@ -38,7 +40,7 @@ import javax.lang.model.element.TypeElement;
  * </pre>
  */
 @AutoService(Processor.class)
-@SupportedAnnotationTypes("*")
+@SupportedAnnotationTypes({ANNOTATION_TYPE_AUTOCACHE})
 public class RxCacheProcessor extends AbstractProcessor{
 
     private Messager mMessager;
@@ -80,6 +82,10 @@ public class RxCacheProcessor extends AbstractProcessor{
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
         //方法参数
 
+        if(set.isEmpty()){
+            return false;
+        }
+
         for(Element e : roundEnvironment.getElementsAnnotatedWith(AutoCache.class)){
 
 
@@ -94,7 +100,7 @@ public class RxCacheProcessor extends AbstractProcessor{
 
 
         }
-        return false;
+        return true;
     }
 
 

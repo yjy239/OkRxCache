@@ -43,7 +43,7 @@ public class RealInterceptorChain<T> implements Interceptor.Chain {
      * @return
      */
     @Override
-    public Observable process() {
+    public synchronized Observable process() {
         if(mRequest.isInterceptor()||mInterceptors.size()<=mIndex){
             return mRequest.getObservable();
         }
