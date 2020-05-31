@@ -13,7 +13,7 @@ package com.yjy.okrxcache.test;
 public class FTest implements ITest<A> {
 
     private A data;
-    private int test = 1;
+    private long test = 1;
 
     @Override
     public A getData() {

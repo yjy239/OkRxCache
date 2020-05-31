@@ -1,8 +1,8 @@
 package com.yjy.okrxcache;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -24,12 +24,17 @@ import com.yjy.okrxcache_core.OkRxCache;
 
 import java.util.ArrayList;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import rx.Observable;
-import rx.Subscriber;
-import rx.schedulers.Schedulers;
+
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(ApiService.URL_BASE)
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 //
@@ -99,19 +104,26 @@ public class MainActivity extends AppCompatActivity {
                 tests.add(t1);
                 tests.add(t2);
 
-                cache.with()
+                OkRxCache.with()
                         .setStragry(CacheStragry.ONLYDISK)
                         .isDebug(true).setConvert(new InterfaceGsonConvert()).put("333",tests,0)
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
-                        .subscribe(new Subscriber<Boolean>() {
+                        .subscribe(new Observer<Boolean>() {
+
+
                             @Override
-                            public void onCompleted() {
+                            public void onError(Throwable e) {
 
                             }
 
                             @Override
-                            public void onError(Throwable e) {
+                            public void onComplete() {
+
+                            }
+
+                            @Override
+                            public void onSubscribe(Disposable d) {
 
                             }
 
@@ -132,16 +144,16 @@ public class MainActivity extends AppCompatActivity {
         get.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cache.with()
+                OkRxCache.with()
                         .isDebug(true)
                         .setConvert(new InterfaceGsonConvert())
                         .setStragry(CacheStragry.ONLYDISK)
                         .get("333",type.getType())
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
-                        .subscribe(new Subscriber<CacheResult>() {
+                        .subscribe(new Observer<CacheResult>() {
                             @Override
-                            public void onCompleted() {
+                            public void onComplete() {
 
                             }
 
@@ -149,8 +161,18 @@ public class MainActivity extends AppCompatActivity {
                             public void onError(Throwable e) {
                                 Log.e("get",e.toString());
                             }
+
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
                             @Override
                             public void onNext(CacheResult cacheResult) {
+                                if(cacheResult.getData() == null){
+                                    Log.e("get","empty");
+                                    return;
+                                }
                                 ArrayList<ITest> tests = (ArrayList<ITest>)cacheResult.getData();
                                 for(int i=0;i<tests.size();i++){
 
@@ -166,37 +188,44 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-//        Observable.fromCallable(f)
-//                .flatMap(new Func1<Boolean, Observable<CacheResult>>() {
-//                    @Override
-//                    public Observable<CacheResult> call(Boolean aBoolean) {
-//                        return OkRxCache.with(MainActivity.this)
-//                                .get("333",type.getType());
-//                    }
-//                })
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(Schedulers.io())
-//                .subscribe(new Subscriber<CacheResult>() {
-//                    @Override
-//                    public void onCompleted() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Log.e("get",e.toString());
-//                    }
-//
-//                    @Override
-//                    public void onNext(CacheResult cacheResult) {
-//                        ArrayList<ITest> tests = (ArrayList<ITest>)cacheResult.getData();
-//                        for(int i=0;i<tests.size();i++){
-//
-//                            Log.e("get",tests.get(i).getData()+"");
-//                        }
-//
-//                    }
-//                });
+        Observable.fromCallable(f)
+                .flatMap(new Function<Boolean, ObservableSource<CacheResult>>() {
+                    @Override
+                    public Observable<CacheResult> apply(Boolean aBoolean) {
+                        return OkRxCache.with(MainActivity.this)
+                                .get("333",type.getType());
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Observer<CacheResult>() {
+
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("get",e.toString());
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(CacheResult cacheResult) {
+                        ArrayList<ITest> tests = (ArrayList<ITest>)cacheResult.getData();
+                        for(int i=0;i<tests.size();i++){
+
+                            Log.e("get",tests.get(i).getData()+"");
+                        }
+
+                    }
+                });
 
 
 
@@ -216,15 +245,21 @@ public class MainActivity extends AppCompatActivity {
                                 .<HttpResult<CommonDictResponse.Result>>transformToCache("111111",111,token.getType()))
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
-                        .subscribe(new Subscriber<CacheResult<HttpResult<CommonDictResponse.Result>>>() {
-                            @Override
-                            public void onCompleted() {
-
-                            }
+                        .subscribe(new Observer<CacheResult<HttpResult<CommonDictResponse.Result>>>() {
 
                             @Override
                             public void onError(Throwable e) {
                                 Log.e("throw",e.toString());
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
                             }
 
                             @Override
@@ -241,14 +276,19 @@ public class MainActivity extends AppCompatActivity {
                 OkRxCache.with(MainActivity.this).remove("222")
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
-                        .subscribe(new Subscriber<Boolean>() {
+                        .subscribe(new Observer<Boolean>() {
                             @Override
-                            public void onCompleted() {
+                            public void onComplete() {
 
                             }
 
                             @Override
                             public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onSubscribe(Disposable d) {
 
                             }
 
@@ -266,9 +306,15 @@ public class MainActivity extends AppCompatActivity {
                 OkRxCache.with(MainActivity.this).clear()
                         .subscribeOn(Schedulers.io())
                         .observeOn(Schedulers.io())
-                        .subscribe(new Subscriber<Boolean>() {
+                        .subscribe(new Observer<Boolean>() {
                             @Override
-                            public void onCompleted() {
+                            public void onComplete() {
+
+                            }
+
+
+                            @Override
+                            public void onSubscribe(Disposable d) {
 
                             }
 
@@ -299,42 +345,27 @@ public class MainActivity extends AppCompatActivity {
                 .observeOn(Schedulers.io());
 
 
-        final Subscriber subscriber = new Subscriber<HttpResult<CommonDictResponse.Result>>() {
-            @Override
-            public void onCompleted() {
+//        final Observer subscriber = new Observer<HttpResult<CommonDictResponse.Result>>() {
+//
+//            @Override
+//            public void onError(Throwable e) {
+//
+//            }
+//
+//            @Override
+//            public void onNext(HttpResult<CommonDictResponse.Result> resultHttpResult) {
+//                Log.e("result",resultHttpResult.data.accountUrl);
+//            }
+//        };
 
-            }
 
-            @Override
-            public void onError(Throwable e) {
 
-            }
+        final ReUseDisposeObvserver reUseSubscriber = new ReUseDisposeObvserver<HttpResult<CommonDictResponse.Result>>(){
 
             @Override
             public void onNext(HttpResult<CommonDictResponse.Result> resultHttpResult) {
                 Log.e("result",resultHttpResult.data.accountUrl);
             }
-        };
-
-        final ReUseSubscriber reUseSubscriber = new ReUseSubscriber(subscriber);
-
-
-
-
-
-
-
-        final RxManager manager = new RxManager();
-        Observable.create(new Observable.OnSubscribe<Object>() {
-            @Override
-            public void call(Subscriber<? super Object> subscriber) {
-
-            }
-        }).subscribe(new Subscriber<Object>() {
-            @Override
-            public void onCompleted() {
-
-            }
 
             @Override
             public void onError(Throwable e) {
@@ -342,10 +373,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onNext(Object o) {
+            public void onComplete() {
 
             }
-        });
+        };
+
+
+
 
 
 

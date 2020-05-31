@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -15,13 +14,10 @@ import com.yjy.okrxcache_core.CacheResult;
 import com.yjy.okrxcache_core.OkRxCache;
 
 
-import java.io.IOException;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
-import okhttp3.*;
-import okhttp3.Response;
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * <pre>
@@ -58,13 +54,18 @@ public class WebActivity extends Activity {
                         .subscribeOn(Schedulers.io())
                         .subscribe(new Observer<CacheResult>() {
                             @Override
-                            public void onCompleted() {
+                            public void onComplete() {
 
                             }
 
                             @Override
                             public void onError(Throwable e) {
                                 Logger.e("Throwable: "+e);
+                            }
+
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
                             }
 
                             @Override

@@ -2,11 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/OkRxCache.iml" filepath="$PROJECT_DIR$/OkRxCache.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/okrxcache-base/okrxcache-base.iml" filepath="$PROJECT_DIR$/okrxcache-base/okrxcache-base.iml" />
-      <module fileurl="file://$PROJECT_DIR$/okrxcache-compiler/okrxcache-compiler.iml" filepath="$PROJECT_DIR$/okrxcache-compiler/okrxcache-compiler.iml" />
-      <module fileurl="file://$PROJECT_DIR$/okrxcache-core/okrxcache-core.iml" filepath="$PROJECT_DIR$/okrxcache-core/okrxcache-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/OkRxCache.iml" filepath="$PROJECT_DIR$/OkRxCache.iml" group="OkRxCache" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="OkRxCache/app" />
+      <module fileurl="file://$PROJECT_DIR$/okrxcache-base/okrxcache-base.iml" filepath="$PROJECT_DIR$/okrxcache-base/okrxcache-base.iml" group="OkRxCache/okrxcache-base" />
+      <module fileurl="file://$PROJECT_DIR$/okrxcache-compiler/okrxcache-compiler.iml" filepath="$PROJECT_DIR$/okrxcache-compiler/okrxcache-compiler.iml" group="OkRxCache/okrxcache-compiler" />
+      <module fileurl="file://$PROJECT_DIR$/okrxcache-core/okrxcache-core.iml" filepath="$PROJECT_DIR$/okrxcache-core/okrxcache-core.iml" group="OkRxCache/okrxcache-core" />
     </modules>
   </component>
 </project>

@@ -1,19 +1,9 @@
 package com.yjy.okrxcache_core.Engine.RxInterceptor;
 
-import android.util.Log;
-
-import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
 import com.yjy.okrxcache_core.Engine.RequestHandler.RequestHandler;
 import com.yjy.okrxcache_core.Utils.LogUtils;
-import com.yjy.okrxcache_core.Utils.Utils;
 
-import okhttp3.ResponseBody;
-import retrofit2.Response;
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Observable;
 
 /**
  * <pre>

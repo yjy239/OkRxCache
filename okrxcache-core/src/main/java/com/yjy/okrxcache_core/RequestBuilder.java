@@ -2,7 +2,6 @@ package com.yjy.okrxcache_core;
 
 import android.content.Context;
 
-import com.google.gson.reflect.TypeToken;
 import com.yjy.okrxcache_base.AutoCache;
 import com.yjy.okrxcache_core.Cache.CacheStragry;
 import com.yjy.okrxcache_core.Cache.DiskCache.DiskCache;
@@ -19,10 +18,11 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
+import io.reactivex.ObservableSource;
+import io.reactivex.ObservableTransformer;
 import okhttp3.OkHttpClient;
-import okhttp3.Response;
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Observable;
+
 
 /**
  * <pre>
@@ -173,10 +173,11 @@ public class RequestBuilder {
     }
 
 
-    public <T>Observable.Transformer<T,CacheResult<T>> transformToCache(final String key, final long lifetime, final Type type){
-        return new Observable.Transformer<T, CacheResult<T>>() {
+    public <T> ObservableTransformer<T,CacheResult<T>> transformToCache(final String key, final long lifetime, final Type type){
+        return new ObservableTransformer<T, CacheResult<T>>() {
+
             @Override
-            public Observable<CacheResult<T>> call(Observable<T> observable) {
+            public ObservableSource<CacheResult<T>> apply(Observable<T> observable) {
                 Request request = build();
                 RequestKey requestKey = new RequestKey(key);
                 request.setKey(requestKey);
@@ -248,7 +249,7 @@ public class RequestBuilder {
      * 清空缓存
      * @return
      */
-    public rx.Observable<Boolean> clear(){
+    public Observable<Boolean> clear(){
         Observable orgin = Observable.just(false);
         Request request = build();
         return mCore.operator(orgin,null,InterceptorMode.CLEAR,request,null);
@@ -259,7 +260,7 @@ public class RequestBuilder {
      * @param key
      * @return
      */
-    public rx.Observable<Boolean> remove(String key){
+    public Observable<Boolean> remove(String key){
         Observable orgin = Observable.just(key);
         Request request = build();
         return mCore.operator(orgin,key,InterceptorMode.REMOVE,request,null);

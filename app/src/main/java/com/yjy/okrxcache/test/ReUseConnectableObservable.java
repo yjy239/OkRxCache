@@ -1,9 +1,5 @@
 package com.yjy.okrxcache.test;
 
-import rx.Subscription;
-import rx.functions.Action1;
-import rx.observables.ConnectableObservable;
-
 /**
  * <pre>
  *     author : yjy
@@ -14,22 +10,22 @@ import rx.observables.ConnectableObservable;
  * </pre>
  */
 
-public abstract class ReUseConnectableObservable extends ConnectableObservable {
-
-
-    public ReUseConnectableObservable(OnSubscribe onSubscribe) {
-        super(onSubscribe);
-    }
-
-    public final Subscription reuseconnect() {
-        final Subscription[] out = new Subscription[1];
-//        connect(new Action1<Subscription>() {
-//            @Override
-//            public void call(Subscription t1) {
-//                out[0] = t1;
-//            }
-//        });
-        return out[0];
-    }
-
-}
+//public abstract class ReUseConnectableObservable extends ConnectableObservable {
+//
+//
+//    public ReUseConnectableObservable(OnSubscribe onSubscribe) {
+//        super(onSubscribe);
+//    }
+//
+//    public final Subscription reuseconnect() {
+//        final Subscription[] out = new Subscription[1];
+////        connect(new Action1<Subscription>() {
+////            @Override
+////            public void call(Subscription t1) {
+////                out[0] = t1;
+////            }
+////        });
+//        return out[0];
+//    }
+//
+//}

@@ -1,14 +1,19 @@
 package com.yjy.okrxcache;
 
+import android.support.annotation.RestrictTo;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 import java.util.List;
 
+import static android.support.annotation.RestrictTo.Scope.LIBRARY_GROUP;
+
 /**
  * Created by huyongqiang on 15/12/15.
  * edited by chenfm01 on 16/6/15
  */
+@RestrictTo(LIBRARY_GROUP)
 public class CommonDictResponse extends Response {
 
     private Result result;

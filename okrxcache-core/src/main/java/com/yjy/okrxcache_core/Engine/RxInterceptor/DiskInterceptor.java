@@ -26,10 +26,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
 
-import retrofit2.http.GET;
-import rx.Observable;
-import rx.Subscriber;
-import rx.functions.Func1;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
+import io.reactivex.ObservableTransformer;
+import io.reactivex.functions.Function;
+import io.reactivex.Observable;
+
 
 /**
  * <pre>
@@ -122,9 +125,9 @@ public class DiskInterceptor<T> implements Interceptor {
      * @return
      */
     private Observable loadFromDiskCache(final Request request){
-        return Observable.create(new Observable.OnSubscribe<Object>() {
+        return Observable.create(new ObservableOnSubscribe<Object>() {
             @Override
-            public void call(Subscriber<? super Object> subscriber) {
+            public void subscribe(ObservableEmitter<Object> subscriber) throws Exception {
                 if(!request.isHadGetCache()){
                     CacheResult result = loadFromDisk(request.getKey(),request.getReturnType());
                     if(result == null){
@@ -139,9 +142,9 @@ public class DiskInterceptor<T> implements Interceptor {
                     }
                 }
 
-                subscriber.onCompleted();
-
+                subscriber.onComplete();
             }
+
         });
     }
 
@@ -151,14 +154,15 @@ public class DiskInterceptor<T> implements Interceptor {
      * @param <T>
      * @return
      */
-    private <T>Observable.Transformer<T,CacheResult<T>> transformToCacheResult(final Request request){
-        return new Observable.Transformer<T, CacheResult<T>>() {
-            @Override
-            public Observable<CacheResult<T>> call(Observable<T> tObservable) {
+    private <T>ObservableTransformer<T,CacheResult<T>> transformToCacheResult(final Request request){
+        return new ObservableTransformer<T, CacheResult<T>>() {
 
-                return tObservable.map(new Func1<T, CacheResult<T>>() {
+            @Override
+            public ObservableSource<CacheResult<T>> apply(Observable<T> tObservable) {
+
+                return tObservable.map(new Function<T, CacheResult<T>>() {
                     @Override
-                    public CacheResult<T> call(T t) {
+                    public CacheResult<T> apply(T t) {
 //                        Log.e("DiskInterceptor","transformeToCacheResult");
                         CacheResult result = null;
                         request.setResult(result);
@@ -181,14 +185,14 @@ public class DiskInterceptor<T> implements Interceptor {
      * @param <T>
      * @return
      */
-    private <T>Observable.Transformer<T,Boolean> saveResultIsSuccess(final Request request){
-        return new Observable.Transformer<T, Boolean>() {
+    private <T>ObservableTransformer<T,Boolean> saveResultIsSuccess(final Request request){
+        return new ObservableTransformer<T, Boolean>() {
             @Override
-            public Observable<Boolean> call(Observable<T> tObservable) {
+            public Observable<Boolean> apply(Observable<T> tObservable) {
 
-                return tObservable.map(new Func1<T, Boolean>() {
+                return tObservable.map(new Function<T, Boolean>() {
                     @Override
-                    public Boolean call(T t) {
+                    public Boolean apply(T t) throws Exception {
                         LogUtils.getInstance().e("okrxcache :"+request.getKey()," DiskInterceptor opterator put: save2DiskCache");
                         request.setResult((CacheResult) t);
                         return save2DiskCache(request.getKey(),(CacheResult) t);
@@ -204,14 +208,14 @@ public class DiskInterceptor<T> implements Interceptor {
      * @param <T>
      * @return
      */
-    private <T>Observable.Transformer<T,Boolean> deleteResultIsSuccess(final Request request){
-        return new Observable.Transformer<T, Boolean>() {
+    private <T>ObservableTransformer<T,Boolean> deleteResultIsSuccess(final Request request){
+        return new ObservableTransformer<T, Boolean>() {
             @Override
-            public Observable<Boolean> call(Observable<T> tObservable) {
+            public ObservableSource<Boolean> apply(Observable<T> tObservable) {
 
-                return tObservable.map(new Func1<T, Boolean>() {
+                return tObservable.map(new Function<T, Boolean>() {
                     @Override
-                    public Boolean call(T t) {
+                    public Boolean apply(T t) {
 
                         LogUtils.getInstance().e("okrxcache :"+request.getKey()," DiskInterceptor opterator delete: deleteFromDisk");
 
@@ -222,14 +226,14 @@ public class DiskInterceptor<T> implements Interceptor {
         };
     }
 
-    private <T>Observable.Transformer<T,Boolean> clearCacheIsSuccess(final Request request){
-        return new Observable.Transformer<T, Boolean>() {
+    private <T>ObservableTransformer<T,Boolean> clearCacheIsSuccess(final Request request){
+        return new ObservableTransformer<T, Boolean>() {
             @Override
-            public Observable<Boolean> call(Observable<T> tObservable) {
+            public ObservableSource<Boolean> apply(Observable<T> tObservable) {
 
-                return tObservable.map(new Func1<T, Boolean>() {
+                return tObservable.map(new Function<T, Boolean>() {
                     @Override
-                    public Boolean call(T t) {
+                    public Boolean apply(T t) {
                         LogUtils.getInstance().e("okrxcache :"+request.getKey()," DiskInterceptor opterator clear: clearFromDisk");
                         return clearFromDisk();
                     }
